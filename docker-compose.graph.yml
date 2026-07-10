@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  qdrant:
+    image: qdrant/qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+
+  neo4j:
+    image: neo4j:latest
+    container_name: neo4j_server
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      - NEO4J_AUTH=neo4j/password
+      # Correct v5 syntax for plugins
+      - NEO4J_PLUGINS=["apoc"]
+      # Allow connections to Bolt and HTTP from outside the container
+      - NEO4J_server_default__advertised__address=localhost
+      # Unrestrict security procedures for APOC
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+      - NEO4J_dbms_security_procedures_allowlist=apoc.*
