@@ -6,6 +6,7 @@ frontend/.next/
 
 .venv/
 env/
+.env
 
 uploads/
 

@@ -17,13 +17,13 @@ from langchain_core.documents import Document
 
 def github_search(query: str, userId: str):
     url = extract_github_url(query)
-    print(url)
     repo_path = clone_repo(url)
+    print(repo_path)
+
     repo = []
     documents = []
     for root, _, files in os.walk(repo_path):
         for file in files:
-
             if not file.endswith(".py"):
                 continue
             file_path = os.path.join(root, file)
@@ -33,17 +33,19 @@ def github_search(query: str, userId: str):
                 continue
             tree = parsed["tree"]
             symbols = extract_symbols(tree, source)
+            print(symbols)
             repo.append(
                 {
                     "file": file_path,
                     "symbols": extract_symbols(tree, source),
-                    "id": f"{file_path}:{symbols[0]['name']}",
+                    "id": f"{file_path}",
                     "calls": extract_calls(tree),
                     "imports": extract_imports(tree),
                     "constants": extract_constants(tree),
                     "global_variables": extract_global_variables(tree),
                 }
             )
+            print("repo", repo)
             for symbol in symbols:
                 documents.append(
                     Document(

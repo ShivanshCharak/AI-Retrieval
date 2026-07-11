@@ -178,8 +178,8 @@ Example:
             # print("going to use memeory")
         if plan.use_vector:
             docs.extend(vector_search(q, userId=userId))
-        # if plan.use_repo:
-        #     docs.extend(github_search(q, userId=userId))
+        if plan.use_repo:
+            docs.extend(github_search(q, userId=userId))
         if not plan.use_vector and not plan.use_memory and not plan.use_graph:
             docs.extend(intro(q))
 
@@ -259,7 +259,7 @@ def graph_router_node(state):
 
             If the user is asking about themselves, their preferences, memories,
             history, possessions, profile, likes, dislikes, goals, or anything that
-            requires retrieving personal information, ALWAYS return "rag".
+            requires retrieving personal information, or he gave you link of github ALWAYS return "rag".
 
             Examples:
             "What do I like?" -> rag
@@ -387,7 +387,13 @@ If the message contains NO new long-term information:
         vector = embedder.embed_query(memory_text)
         client.upsert(
             collection_name="documents",
-            points=[PointStruct(id=memory.id, vector=vector, payload={"user_id": userId, "text": decision.memory})],
+            points=[
+                PointStruct(
+                    id=memory.id,
+                    vector=vector,
+                    payload={"user_id": userId, "text": decision.memory},
+                )
+            ],
         )
 
     return memory
