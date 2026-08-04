@@ -1,0 +1,100 @@
+query,expected_answer
+How does the query routing work?,Query Routing routes product questions directly and routes knowledge questions to the retrieval pipeline.
+What databases does the system use for vector search?,The system uses a Vector Database as a retrieval source for searching indexed content.
+Can this assistant search GitHub repositories?,"Yes. The GitHub Code Assistant can search GitHub repositories, find relevant code, and answer repository-specific questions."
+What technologies are used for result fusion?,The system combines retrieved documents using Reciprocal Rank Fusion (RRF).
+How does long-term memory work in this system?,"Long-term memory stores stable user information such as preferences, occupation, education, goals, likes, dislikes, and other stable facts."
+What formats can be indexed in the vector database?,"The Vector Database can index PDFs, books, notes, documentation, research papers, manuals, reports, resumes, and GitHub repositories."
+Can the knowledge graph explain service dependencies?,Yes. The Knowledge Graph can answer relationship-based questions such as service dependencies.
+What does the GitHub assistant do with request flows?,It can explain request flows in a codebase.
+When is web search used as a retrieval source?,Web Search is used when local knowledge is insufficient.
+What is query expansion?,Query Expansion generates multiple search queries to improve retrieval.
+How does the system handle parallel retrieval?,The system retrieves information from multiple sources simultaneously.
+What user information is stored in long-term memory?,"Long-term memory stores personal profile, preferences, occupation, education, goals, stable facts, likes, and dislikes."
+Can the system index research papers and resumes?,Yes. Research papers and resumes can be indexed in the Vector Database.
+What are the 8 steps in the system architecture?,"The architecture consists of Query Routing, Retrieval Planning, Query Expansion, Parallel Retrieval, Result Fusion, Reranking, Response Generation, and Memory Extraction."
+Does this assistant support HYDE?,Yes. HYDE is listed as one of the technologies used.
+How does reranking fit into the architecture?,Reranking ranks retrieved documents according to relevance after Result Fusion.
+What type of relationship questions can the knowledge graph answer?,"The Knowledge Graph answers questions about service dependencies, API relationships, authentication flow, and class interactions."
+Can I use this assistant to find relevant code in a repo?,Yes. The GitHub Code Assistant can find relevant code in repositories.
+What is the purpose of memory extraction?,Memory Extraction extracts and stores stable user information for future interactions.
+Does the system combine vector search with web search?,Yes. Retrieval Planning can select both the Vector Database and Web Search.
+How does the system answer repository-specific questions?,It uses the GitHub Code Assistant to understand and answer repository-specific questions.
+What is Multi Query Generation used for?,Multi Query Generation creates multiple search queries to improve retrieval.
+Can the assistant explain authentication flows in a codebase?,Yes. It can explain authentication flows in repositories.
+What kind of notes can be indexed in the vector DB?,Notes and documentation can be indexed in the Vector Database.
+How does the assistant generate responses?,It generates grounded responses using retrieved context.
+What is the overview of this project?,"It is an AI Retrieval and GitHub Code Assistant that combines memory, retrieval, repository understanding, and web search."
+Does the system support query decomposition?,Yes. Query Decomposition is one of the supported technologies.
+Can the assistant explain API relationships in a project?,Yes. API relationships can be explained using the Knowledge Graph.
+What happens when local knowledge is not enough to answer?,The system uses Web Search when local knowledge is insufficient.
+What personal attributes are stored in memory?,"Preferences, occupation, education, goals, stable facts, likes, and dislikes are stored."
+Is Reciprocal Rank Fusion used before or after reranking?,Reciprocal Rank Fusion is used before Reranking.
+Can the assistant explain module relationships?,Yes. It can explain module relationships in repositories.
+What is the role of retrieval planning?,"Retrieval Planning selects one or more retrieval sources such as Memory, Vector Database, Knowledge Graph, and Web Search."
+Can the system index manuals and reports?,Yes. Manuals and reports can be indexed in the Vector Database.
+Does the assistant answer questions using only an LLM?,No. It selects the most appropriate knowledge source instead of relying only on an LLM.
+What tech is used for query classification?,Query Classification is one of the technologies used.
+Can I search documentation through the GitHub assistant?,Yes. The GitHub Code Assistant can search documentation.
+How does the pipeline handle multi-source retrieval?,"It performs Parallel Retrieval, then Result Fusion using RRF, followed by Reranking."
+Does the system remember user preferences across sessions?,Yes. Long-term memory stores user preferences and other stable facts.
+What step comes after Result Fusion?,Reranking comes after Result Fusion.
+Can the assistant explain system architecture of a repo?,Yes. It can explain the architecture of a repository.
+Does the vector database index books?,Yes. Books can be indexed in the Vector Database.
+What kind of facts are stored in memory?,"Stable facts, preferences, occupation, education, goals, likes, and dislikes are stored."
+What is the primary responsibility of query routing?,It routes product questions directly and knowledge questions to the retrieval pipeline.
+Can the assistant explain request flows in code?,Yes. It can explain request flows in code.
+How does the system ensure answers are grounded?,It generates answers using retrieved context.
+What steps occur between Query Expansion and Result Fusion?,Parallel Retrieval occurs between Query Expansion and Result Fusion.
+Can the knowledge graph explain class interactions?,Yes. The Knowledge Graph supports class interaction questions.
+Is RAG supported in this system?,Yes. The system supports Retrieval-Augmented Generation (RAG).
+What is the first step in the retrieval architecture?,The first step is Query Routing.
+What is the pricing tier for using this assistant?,I dont have that information.
+Does this system support Slack or Discord integration?,I dont have that information.
+Which LLM model is used under the hood?,I dont have that information.
+Does the backend run on AWS or GCP?,I dont have that information.
+Is there an iOS or Android mobile app available?,I dont have that information.
+What programming language was used to build this backend?,I dont have that information.
+Does the system support audio or video file indexing?,I dont have that information.
+What vector database engine is used like Pinecone or Qdrant?,I dont have that information.
+How much storage space is allocated per user memory?,I dont have that information.
+Can this assistant write and execute code automatically in a sandbox?,I dont have that information.
+Does the system support multi-language translation?,I dont have that information.
+How many requests per minute does the API rate limit allow?,I dont have that information.
+What authentication protocol is used for logging into the assistant?,I dont have that information.
+Can the system generate synthetic training data?,I dont have that information.
+Is Docker or Kubernetes used for deployment?,I dont have that information.
+Does the system support voice inputs?,I dont have that information.
+What version of Python or Node.js is required?,I dont have that information.
+Can I export my memory data as a JSON file?,I dont have that information.
+Does the GitHub assistant automatically create Pull Requests?,I dont have that information.
+Is Neo4j used for the Knowledge Graph?,I dont have that information.
+What embedding model is used for the vector database?,I dont have that information.
+Does this system support image generation like DALL-E?,I dont have that information.
+Can this assistant manage my Google Calendar events?,I dont have that information.
+Does the system have a Chrome extension?,I dont have that information.
+How many total users can the multi-tenant system support?,I dont have that information.
+Does the system support fine-tuning on custom datasets?,I dont have that information.
+Can I deploy this on-premise using air-gapped servers?,I dont have that information.
+Is there a GUI interface built in React or Next.js?,I dont have that information.
+Does the web search use Tavily or Serper API?,I dont have that information.
+Can the assistant fix bugs in my code and commit them to Git?,I dont have that information.
+What is the maximum token context length for the system?,I dont have that information.
+Does the system support fine-grained Role-Based Access Control (RBAC)?,I dont have that information.
+Can the vector database perform real-time streaming updates?,I dont have that information.
+Does the assistant support PDF OCR for scanned documents?,I dont have that information.
+What is the latency SLA for generating a response?,I dont have that information.
+Can the memory module erase specific memories upon request?,I dont have that information.
+Does the system use Redis for caching queries?,I dont have that information.
+Can the GitHub assistant clone private repositories without SSH keys?,I dont have that information.
+Is there a telemetry or logging stack like Prometheus or Grafana?,I dont have that information.
+Does the system support semantic caching?,I dont have that information.
+Can the assistant run local open-weights LLMs like Ollama?,I dont have that information.
+Does the system support automated end-to-end testing?,I dont have that information.
+Can I connect my Notion workspace to the vector database?,I dont have that information.
+Does the knowledge graph support SPARQL queries?,I dont have that information.
+Can the system send email notifications for query completions?,I dont have that information.
+What license is this project distributed under?,I dont have that information.
+Does the assistant integrate with Jira or Confluence?,I dont have that information.
+Can the memory extraction feature automatically detect user mood?,I dont have that information.
+Is there a CLI tool to interact with the assistant?,I dont have that information.
