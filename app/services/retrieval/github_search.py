@@ -33,7 +33,7 @@ def github_search(query: str, userId: str):
                 continue
             tree = parsed["tree"]
             symbols = extract_symbols(tree, source)
-            print(symbols)
+
             repo.append(
                 {
                     "file": file_path,

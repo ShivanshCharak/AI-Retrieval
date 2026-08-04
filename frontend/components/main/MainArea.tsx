@@ -12,43 +12,48 @@ import { LoaderIcon } from "lucide-react";
 
 interface MainAreaProps {
   userName?: string;
-  sidebarVisibility: boolean
+  sidebarVisibility: boolean;
 }
 
-
-export default function MainArea({ userName = "Toby", sidebarVisibility }: MainAreaProps) {
-  const [status, setStatus] = useState<string>("")
+export default function MainArea({
+  userName = "Toby",
+  sidebarVisibility,
+}: MainAreaProps) {
+  const [status, setStatus] = useState<{stage:string,title:string, description:string}[]>([]);
   const [message, setMessage] = useState<
-    { role: "user" | "assistant"; content: string; loading: boolean; file?:{name:string, type:string} }[]
+    {
+      role: "user" | "assistant";
+      content: string;
+      loading: boolean;
+      file?: { name: string; type: string };
+    }[]
   >([]);
   const [isChatting, setIsChatting] = useState<boolean>(false);
-const handleSend = (
-  content: string,
-  model: string,
-  file?: File
-) => {
-  setMessage(prev => [
-    ...prev,
-    {
-      role: "user",
-      content,
-      loading: false,
-      file: file
-        ? {
-            name: file.name,
-            type: file.type,
-          }
-        : undefined,
-    },
-    {
-      role: "assistant",
-      content: "",
-      loading: true,
-    },
-  ]);
-};
+  const handleSend = (content: string, model: string, file?: File) => {
+    setMessage((prev) => [
+      ...prev,
+      {
+        role: "user",
+        content,
+        loading: false,
+        file: file
+          ? {
+              name: file.name,
+              type: file.type,
+            }
+          : undefined,
+      },
+      {
+        role: "assistant",
+        content: "",
+        loading: true,
+      },
+    ]);
+  };
   return (
-    <main className={`flex-1 flex flex-col items-center justify-center gap-8 bg-gray-50 px-6 ${sidebarVisibility?"w-[83%]":"w-[97%]"} overflow-y-scroll`}>
+    <main
+      className={`flex-1 flex flex-col items-center justify-center gap-8 bg-gray-50 px-6 ${sidebarVisibility ? "w-[83%]" : "w-[97%]"} overflow-y-scroll`}
+    >
       <div className="flex flex-col items-center gap-5">
         {message.length == 0 ? (
           <>
@@ -71,24 +76,24 @@ const handleSend = (
           >
             {msg.loading ? (
               <div className=" flex justify-around">
-              <LoaderIcon className="animate-spin"/>
-              
-              <label htmlFor="" className=" ml-3">{status}</label>
+                <LoaderIcon className="animate-spin" />
+
+                <label htmlFor="" className=" ml-3">
+                  {status}
+                </label>
               </div>
             ) : (
               <>
-              {msg.role === "user" && msg.file && (
-  <div className="mb-2 flex items-center gap-2 rounded-lg border border-gray-500 bg-gray-800 px-3 py-2 w-fit">
-    <Paperclip size={14} />
-    <span>{msg.file.name}</span>
-  </div>
-)}
+                {msg.role === "user" && msg.file && (
+                  <div className="mb-2 flex items-center gap-2 rounded-lg border border-gray-500 bg-gray-800 px-3 py-2 w-fit">
+                    <Paperclip size={14} />
+                    <span>{msg.file.name}</span>
+                  </div>
+                )}
 
-          
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-
-                {msg.content}
-              </ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {msg.content}
+                </ReactMarkdown>
               </>
             )}
           </div>
@@ -99,7 +104,7 @@ const handleSend = (
         onSend={handleSend}
         setMessage={setMessage}
         chatting={isChatting}
-        setChatting ={setIsChatting}
+        setChatting={setIsChatting}
         status={status}
         setStatus={setStatus}
       />

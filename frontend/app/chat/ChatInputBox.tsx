@@ -17,7 +17,7 @@ interface ChatInputBoxProps {
   setChatting: boolean;
   setMessage: React.Dispatch<React.SetStateAction<{role:"user"|"assistant";content: string, loading:boolean, file?:{name:string, type:string}}[]>>;
   webSearch?: boolean;
-  setStatus: React.Dispatch<SetStateAction<string>>
+  setStatus: React.Dispatch<SetStateAction<{stage:string,title:string, description:string}[]>>
   status: string
 }
 
@@ -76,10 +76,28 @@ while (true) {
     const data = JSON.parse(event.slice(6));
 
     switch (data.type) {
-      case "status":
-        console.log("Completed:", data.node);
-        setStatus(data.node)
-        break;
+    case "progress":
+
+      setStatus(prev => {
+
+          const exists = prev.find(
+              p => p.stage === data.stage
+          );
+
+          if (exists) return prev;
+
+          return [
+              ...prev,
+              {
+                  stage: data.stage,
+                  title: data.title,
+                  description: data.description
+              }
+          ];
+
+      });
+
+      break;
 
       case "token":
         answer += data.content;
@@ -121,7 +139,7 @@ while (true) {
     <div
       className={` w-[1000px] bg-white rounded-2xl  shadow-sm border border-gray-200 overflow-hidden ${chatting ? "bottom-0 fixed" : ""}`}
     >
-      {console.log("chatting",chatting)}
+      
       {/* Upgrade banner */}
       <div className="flex items-center gap-1 px-4 pt-3 pb-1">
         <span className="text-xs text-gray-500">

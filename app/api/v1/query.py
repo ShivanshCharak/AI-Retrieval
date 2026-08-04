@@ -15,6 +15,33 @@ router = APIRouter()
 
 SECRET_KEY = "4WfP4JbL6lLQ5zQZ_8K4YxW5RkM8bM7T9dN2L8xR1cA"
 
+PROGRESS_MESSAGES = {
+    "router": {
+        "title": "Understanding your question",
+        "description": "Determining the best way to answer.",
+    },
+    "query_generation": {
+        "title": "Generating search queries",
+        "description": "Creating optimized search terms.",
+    },
+    "retrieval": {
+        "title": "Searching documents",
+        "description": "Looking through your uploaded files and knowledge.",
+    },
+    "fusion": {
+        "title": "Combining search results",
+        "description": "Merging results from multiple searches.",
+    },
+    "rerank": {
+        "title": "Ranking results",
+        "description": "Keeping only the most relevant information.",
+    },
+    "simple_answers": {
+        "title": "Preparing response",
+        "description": "Generating a direct answer.",
+    },
+}
+
 
 @router.post("/chat")
 async def query(
@@ -50,7 +77,17 @@ async def query(
             if mode == "updates":
                 node = list(data.keys())[0]
 
-                yield (f"data: {json.dumps({'type': 'status', 'node': node})}\n\n")
+                progress = PROGRESS_MESSAGES.get(
+                    node,
+                    {"title": node.replace("_", " ").title(), "description": ""},
+                )
+
+                yield (f"data: {json.dumps({
+                        'type': 'progress',
+                        'stage': node,
+                        'title': progress['title'],
+                        'description': progress['description']
+                    })}\n\n")
 
             elif mode == "values":
                 final_state = data
@@ -76,7 +113,12 @@ async def query(
         print("doc", docs)
 
         context = "\n\n".join(
-            json.dumps(doc["content"]) if isinstance(doc["content"], dict) else str(doc["content"]) for doc in docs
+            (
+                json.dumps(doc["content"])
+                if isinstance(doc["content"], dict)
+                else str(doc["content"])
+            )
+            for doc in docs
         )
         print("context", context)
 

@@ -1,15 +1,15 @@
 {
-  "summary": "Shivansh Charak is a software engineer with a Bachelor of Science in Computer Science from Vishwakarma University. He works remotely at Foundry AI, developing scalable backend services for a multi-tenant LMS. His expertise includes building production-grade RAG pipelines, implementing hybrid search solutions, and using technologies like PostgreSQL, OpenAI embeddings, and PydanticAI. His work focuses on enterprise knowledge retrieval and AI-assisted code generation.",
+  "summary": "Shivansh Charak is a software engineer and database systems specialist focused on scalable backend infrastructure, hybrid search engine design, and multi-tenant architectures. Holding a Bachelor of Science in Computer Science from Vishwakarma University, he engineers production-grade Retrieval-Augmented Generation (RAG) pipelines and distributed services at Foundry AI. His work centers on leveraging PostgreSQL for high-throughput enterprise knowledge retrieval, vector indexing, and integrating modern AI frameworks like PydanticAI.",
   "topics": [
-    "Education",
-    "Software Engineering",
+    "Database Architecture & Performance",
+    "PostgreSQL & Vector Search",
+    "Hybrid Search Systems (Lexical + Semantic)",
     "Retrieval-Augmented Generation (RAG)",
-    "PostgreSQL",
-    "Hybrid Search",
-    "AI/ML",
-    "Backend Development",
-    "Document Ingestion",
-    "OpenAI",
-    "Remote Work"
+    "Multi-Tenant Infrastructure",
+    "Enterprise Knowledge Retrieval",
+    "High-Throughput Ingestion Pipelines",
+    "Agentic Systems & PydanticAI",
+    "OpenAI Embeddings",
+    "Distributed Backend Systems"
   ]
 }

@@ -1,0 +1,71 @@
+query,expected_category
+Hello,intro
+Hi there,intro
+Good morning,intro
+Hey,intro
+How's it going?,intro
+What's up?,intro
+Greetings,intro
+How are you doing today?,intro
+Hope you are well,intro
+Good evening,intro
+Hey AI,intro
+Yo,intro
+How was your day?,intro
+Nice to meet you,intro
+Long time no see,intro
+What is FastAPI?,simple
+What is C++?,simple
+What does HTML stand for?,simple
+What is the syntax for a print statement in Python?,simple
+Who created Python?,simple
+What is an API?,simple
+What is Git?,simple
+Define polymorphism in OOP,simple
+What is a primary key in SQL?,simple
+What is the HTTP status code for Not Found?,simple
+What does CSS stand for?,simple
+What is Docker?,simple
+What is TypeScript?,simple
+What is a JSON object?,simple
+What port does HTTP run on by default?,simple
+What is React?,simple
+What is NPM?,simple
+What is an IP address?,simple
+What is Redis?,simple
+What is Kubernetes?,simple
+Define recursion,simple
+What is a boolean?,simple
+What does CPU stand for?,simple
+What is MongoDB?,simple
+What is GraphQL?,simple
+What is an array?,simple
+What is UTF-8?,simple
+What is SSH?,simple
+What is Terraform?,simple
+What is Linux?,simple
+something with python,sparse
+best way to fix bug,sparse
+database connection error,sparse
+docker build slow,sparse
+memory leak,sparse
+api error,sparse
+react state issue,sparse
+slow query,sparse
+authenticating user,sparse
+deploy to cloud,sparse
+microservices architecture,sparse
+terraform state broken,sparse
+CORS issue,sparse
+null pointer,sparse
+fastapi async,sparse
+python list comprehension,sparse
+kubernetes crashloopbackoff,sparse
+git merge conflict,sparse
+auth token expired,sparse
+optimize sql,sparse
+web socket drop,sparse
+cache invalidation,sparse
+build failing,sparse
+high cpu usage,simple
+clean code tips,simple

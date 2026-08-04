@@ -38,7 +38,7 @@ export default function AuthBlock({ sidebarVisibility }: TAuthBlock) {
                {user.name}
               </span>
             )}
-            <span className="text-gray-600 font-semibold"> {user?.email.slice(0, 13)}....</span>
+            <span className="text-gray-600 font-semibold"> {user?.email && user?.email.slice(0, 13)}....</span>
           </div>}
           <EllipsisVertical
             className="mt-5"
