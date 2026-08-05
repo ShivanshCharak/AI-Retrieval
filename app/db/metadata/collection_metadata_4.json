@@ -1,15 +1,25 @@
 {
-  "summary": "Shivansh Charak is a software engineer and database systems specialist focused on scalable backend infrastructure, hybrid search engine design, and multi-tenant architectures. Holding a Bachelor of Science in Computer Science from Vishwakarma University, he engineers production-grade Retrieval-Augmented Generation (RAG) pipelines and distributed services at Foundry AI. His work centers on leveraging PostgreSQL for high-throughput enterprise knowledge retrieval, vector indexing, and integrating modern AI frameworks like PydanticAI.",
+  "summary": "Database Internals is a comprehensive technical reference covering the architecture and implementation of modern database management systems. It explores storage engines, indexing structures, transaction processing, concurrency control, distributed systems, replication, consensus algorithms, query execution, and durability mechanisms. The material emphasizes how databases are designed under real-world constraints, explaining the trade-offs behind scalable, fault-tolerant, and high-performance database systems.",
   "topics": [
-    "Database Architecture & Performance",
-    "PostgreSQL & Vector Search",
-    "Hybrid Search Systems (Lexical + Semantic)",
-    "Retrieval-Augmented Generation (RAG)",
-    "Multi-Tenant Infrastructure",
-    "Enterprise Knowledge Retrieval",
-    "High-Throughput Ingestion Pipelines",
-    "Agentic Systems & PydanticAI",
-    "OpenAI Embeddings",
-    "Distributed Backend Systems"
+    "Database Storage Engines",
+    "B-Tree Indexes",
+    "LSM Trees",
+    "Write-Ahead Logging (WAL)",
+    "MVCC (Multi-Version Concurrency Control)",
+    "Transactions & ACID",
+    "Concurrency Control",
+    "Locking Protocols",
+    "Recovery Algorithms",
+    "Buffer Pool Management",
+    "Query Execution",
+    "Query Optimization",
+    "Distributed Databases",
+    "Replication",
+    "Consensus Algorithms (Raft, Paxos)",
+    "Distributed Transactions",
+    "Partitioning & Sharding",
+    "Consistency Models",
+    "Compaction Strategies",
+    "Database Performance & Scalability"
   ]
 }

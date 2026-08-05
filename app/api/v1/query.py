@@ -62,10 +62,10 @@ async def query(
 
     if file and file.size > 0:
         await ingest(file, user_id)
+    
 
     async def generate():
         final_state = None
-        print("message", message)
         async for mode, data in graph.astream(
             {
                 "query": message,

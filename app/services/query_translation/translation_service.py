@@ -2,7 +2,6 @@ from app.services.query_translation.query_classifier import classify_query
 from app.services.query_translation.router import route_query
 
 from app.services.query_translation.multi_query import generate_multi_queries
-from app.services import intro
 from app.services.query_translation.hyde import generate_hyde
 from app.db.metadata_store import get_collection_metadata
 
@@ -19,8 +18,6 @@ def generate_queries(query: str):
 
 def execute_techniques(query: str, techniques: list[str], metadata):
     results = []
-    if "intro" in techniques:
-        results.extend(intro(query))
     if "multi_query" in techniques:
         results.extend(generate_multi_queries(query, metadata))
     if "decomposition" or "step_back" in techniques:
