@@ -19,9 +19,6 @@ export async function POST(req: Request) {
   if (file && file instanceof File) {
     backendForm.append("file", file);
   }
-
-
-
   const res = await fetch("http://localhost:8000/api/v1/chat", {
     headers:{
       Cookie:cookie??""

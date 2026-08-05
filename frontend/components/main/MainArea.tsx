@@ -78,9 +78,7 @@ export default function MainArea({
               <div className=" flex justify-around">
                 <LoaderIcon className="animate-spin" />
 
-                <label htmlFor="" className=" ml-3">
-                  {status}
-                </label>
+         
               </div>
             ) : (
               <>

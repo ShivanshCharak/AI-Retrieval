@@ -70,6 +70,7 @@ async def query(
             {
                 "query": message,
                 "userId": user_id,
+                "trace": [],
                 "deep_search": deep_search,
             },
             stream_mode=["updates", "values"],

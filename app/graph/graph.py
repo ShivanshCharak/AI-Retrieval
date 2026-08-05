@@ -1,5 +1,6 @@
 from langgraph.graph import StateGraph, END
 from app.graph.state import GraphState
+from app.services.query_translation.product_faq import product_faq
 
 from app.graph.nodes import (
     generated_queries,
@@ -7,7 +8,6 @@ from app.graph.nodes import (
     fusion_node,
     rerank_nodes,
     graph_router_node,
-    simple_answers,
 )
 
 workflow = StateGraph(GraphState)
@@ -38,8 +38,11 @@ workflow.add_node("fusion", fusion_node)
 workflow.add_node("rerank", rerank_nodes)
 
 
-workflow.add_node("simple_answers", simple_answers)
+# workflow.add_node("simple_answers", simple_answers)
+workflow.add_node("product_faq", product_faq)
 workflow.set_entry_point("router")
+
+# workflow.add_edge("simple_answers", "product_faq")
 
 workflow.add_edge("query_generation", "retrieval")
 
@@ -50,7 +53,9 @@ workflow.add_edge("fusion", "rerank")
 workflow.add_edge("rerank", END)
 
 workflow.add_conditional_edges(
-    "router", route_decision, {"deep": "query_generation", "product": "simple_answers", "quick": "retrieval"}
+    "router",
+    route_decision,
+    {"deep": "query_generation", "product": "product_faq", "quick": "retrieval"},
 )
 
 

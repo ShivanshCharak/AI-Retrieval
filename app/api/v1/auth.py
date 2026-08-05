@@ -28,14 +28,20 @@ class SigninRequest(BaseModel):
 
 
 @router.post("/signup")
-async def signup(data: SignupRequest, response: Response, db: Session = Depends(get_db)):
+async def signup(
+    data: SignupRequest, response: Response, db: Session = Depends(get_db)
+):
     if not data.email or not data.name or not data.password:
         raise HTTPException(status_code=400, detail="Fields are missing")
     existing = db.scalar(select(User).where(User.email == data.email))
     if existing:
         raise HTTPException(status_code=409, detail="Emails already exist")
     try:
-        user = User(name=data.name, email=data.email, password_hash=password_hash.hash(data.password))
+        user = User(
+            name=data.name,
+            email=data.email,
+            password_hash=password_hash.hash(data.password),
+        )
         db.add(user)
         db.commit()
         db.refresh(user)
@@ -46,20 +52,34 @@ async def signup(data: SignupRequest, response: Response, db: Session = Depends(
 
 
 @router.post("/signin")
-async def signin(data: SigninRequest, response: Response, db: Session = Depends(get_db)):
+async def signin(
+    data: SigninRequest, response: Response, db: Session = Depends(get_db)
+):
     print(data)
     if not data.email or not data.password:
         raise HTTPException(status_code=500, detail="fields are missing")
     user = db.scalar(select(User).where(User.email == data.email))
-    payload = {"user_id": user.id, "email": user.email, "exp": datetime.now(timezone.utc) + timedelta(hours=1)}
-    token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
     if user is None:
         raise HTTPException(status_code=401, detail="invalid email or password")
+    print(user)
+    payload = {
+        "user_id": user.id,
+        "email": user.email,
+        "exp": datetime.now(timezone.utc) + timedelta(hours=1),
+    }
+    token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
 
     if not password_hash.verify(data.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
-    response.set_cookie(key="access_token", value=token, httponly=True, secure=False, samesite="lax", max_age=3000)
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        secure=False,
+        samesite="lax",
+        max_age=3000,
+    )
     return {"status": 200, "detail": "login sucesffull"}
 
 

@@ -12,3 +12,5 @@ class GraphState(TypedDict):
     web_search: bool
     userId: str
     deep_search: bool
+
+    trace: List[dict]

@@ -9,6 +9,7 @@ export async function POST(req:Request){
         body: JSON.stringify(body),
         method:"POST"
      })
+     console.log(response)
      const data = await response.json()
      const nextresponse = NextResponse.json(data,{status:response.status})
      const setcookies = response.headers.get("set-cookie")

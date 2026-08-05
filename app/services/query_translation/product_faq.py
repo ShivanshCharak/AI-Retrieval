@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 from app.services.llm.llm_service import llm
+import time as Time
+from app.graph.state import GraphState
 
 
 class ProductfaqOutput(BaseModel):
@@ -7,7 +9,9 @@ class ProductfaqOutput(BaseModel):
     confidence: float
 
 
-def product_faq(query: str):
+def product_faq(state: GraphState):
+    start = Time.time()
+    query = state["query"]
     prompt = f"""
     As an ai agent,your primary responsibility is to answer user queries about this AI Retrieval & GitHub Code Assistant using ONLY the information provided below.
     
@@ -123,10 +127,21 @@ def product_faq(query: str):
         - Search documentation
         - Understand module relationships
         - Answer repository-specific questions
+        #VERY IMPORTANT
+        - if query comes with hey, hello or greetings in particulary, you have to greet it back and dont tell anything about the system until asked
+        - if it says something like how you doing or how you feeling or anythng about your feeling, you can say you are an ai and dont have sense of feeling
         Query:-
         {query}
     """
     response = llm.with_structured_output(ProductfaqOutput).invoke(prompt)
+    state["trace"].append(
+        {
+            "node": "product_faq",
+            "latency_ms": (Time.time() - start) * 1000,
+            "input": state["query"],
+            "output": response.response,
+            "confidence": response.confidence,
+        }
+    )
 
-    print(response)
-    return response
+    return {**state, "answer": response.response, "confidence": response.confidence}

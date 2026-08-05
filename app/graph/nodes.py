@@ -14,7 +14,8 @@ from app.services.retrieval.memory_search import memory_search
 from app.services.retrieval.github_search import github_search
 from app.db.models import Memory
 from typing import Literal
-from app.services.intro import intro
+
+# from app.services.intro import intro
 from app.db.database import get_db
 from pathlib import Path
 
@@ -180,8 +181,8 @@ Example:
             docs.extend(vector_search(q, userId=userId))
         if plan.use_repo:
             docs.extend(github_search(q, userId=userId))
-        if not plan.use_vector and not plan.use_memory and not plan.use_graph:
-            docs.extend(intro(q))
+        # if not plan.use_vector and not plan.use_memory and not plan.use_graph:
+        #     docs.extend(intro(q))
 
         # if plan.use_graph:
         # docs.extend(graph_search(q))
@@ -308,9 +309,9 @@ def graph_router_node(state):
     return {"route": decision.route}
 
 
-def simple_answers(state):
-    print("simple answer")
-    return {"answer": intro(state["query"])}
+# def simple_answers(state):
+#     print("simple answer")
+#     return {"answer": intro(state["query"])}
 
 
 class MemoryDecision(BaseModel):
