@@ -18,7 +18,7 @@ def generate_multi_queries(query: str, metadata: str = "") -> list[str]:
             (
                 "system",
                 """
-You are an expert AI search refinement agent. Your task is to analyze a user's input query (primarily software engineering or technical topics) and break it down into exactly 5 distinct variations.
+You are an expert AI search refinement agent. Your task is to analyze a user's input query ( and break it down into exactly 5 distinct variations.
 
 Follow these strict structural constraints:
 - Do not expand abbreviations (e.g., LLM, API, RAG) if the precise architectural context is omitted.

@@ -1,0 +1,51 @@
+query,expected_step_back_query
+How do B-Tree indexes work in storage engines?,What underlying data structures and algorithms enable efficient ordered indexing in storage systems?
+What is the difference between B-Trees and LSM Trees?,What tradeoffs exist between different storage structures optimized for read-heavy versus write-heavy workloads?
+How does write-ahead logging ensure durability?,How do systems guarantee durability of state changes in the presence of unexpected crashes or power failures?
+What is a memtable in an LSM-based storage engine?,What role does in-memory buffering play in the write path of a persistent storage system?
+How do SSTables get compacted over time?,How do storage systems reclaim space and maintain read efficiency as immutable data files accumulate over time?
+What role do bloom filters play in read optimization?,What probabilistic techniques help avoid unnecessary I/O when checking for the existence of a value?
+How does the buffer pool manage pages in memory?,How do systems cache frequently accessed data in memory to reduce disk I/O?
+What is checkpointing used for in database recovery?,How do systems bound the amount of recovery work needed after a crash?
+How does the ARIES recovery algorithm work?,What general algorithmic phases do recovery systems use to restore a consistent state after failure?
+What are the different B-Tree node splitting strategies?,How do balanced tree structures maintain their invariants as data is inserted or removed?
+How does copy-on-write B-Tree differ from traditional B-Tree?,What update strategies allow data structures to support consistent snapshots without locking readers?
+What is the RUM conjecture in storage engine design?,What fundamental tradeoffs constrain the design of any indexing data structure?
+How do log-structured merge trees handle writes?,How do write-optimized storage systems convert incoming writes into sequential disk I/O?
+What is the purpose of a page cache in database systems?,How does the operating system's memory management interact with application-level caching layers?
+How does leader-follower replication maintain consistency?,How do distributed systems propagate state changes from a single source of truth to multiple copies?
+What is quorum-based replication?,How do distributed systems use voting or overlap guarantees to balance consistency and availability?
+How does the Raft consensus algorithm elect a leader?,How do distributed consensus protocols agree on a single coordinator despite failures?
+What is the difference between Paxos and Raft?,How do different consensus protocol designs balance theoretical generality against practical understandability?
+How does two-phase commit coordinate distributed transactions?,How do coordinated multi-node systems ensure all-or-nothing outcomes for operations spanning several participants?
+What are the limitations of two-phase commit?,What availability and fault-tolerance tradeoffs arise from coordinator-based distributed protocols?
+How does three-phase commit improve on 2PC?,How can distributed commit protocols be modified to avoid indefinite blocking on coordinator failure?
+What is gossip protocol used for in distributed systems?,How do large distributed clusters disseminate membership and state information without a central coordinator?
+How does anti-entropy repair replica divergence?,How do eventually consistent systems reconcile divergent copies of the same data over time?
+What is hinted handoff in distributed storage?,How do distributed storage systems preserve write availability when a target replica is temporarily unreachable?
+How do vector clocks track causality in distributed systems?,How do distributed systems determine the causal ordering of events without a shared global clock?
+What is the CAP theorem and its tradeoffs?,What theoretical limits govern the tradeoffs distributed systems must make under network failure?
+How does consistent hashing distribute data across nodes?,How do distributed systems minimize data movement when the number of nodes in a cluster changes?
+What is partitioning strategy in distributed databases?,How do distributed databases divide large datasets across multiple machines?
+How does MVCC handle concurrent transactions?,How do database systems allow concurrent readers and writers to operate without blocking each other?
+What are the different isolation levels in databases?,How do database systems define and enforce guarantees about what concurrent transactions can observe?
+How does read repair work in eventually consistent systems?,How can inconsistencies between distributed replicas be corrected as a side effect of normal client operations?
+What is a CRDT and how does it resolve conflicts?,What data structure designs allow concurrent updates across replicas to merge automatically without coordination?
+How do database systems handle crash recovery?,What general procedure do stateful systems follow to restore consistency after an unexpected failure?
+What is the difference between redo and undo logging?,What logging strategies allow systems to selectively reapply or reverse changes during recovery?
+How does write amplification affect LSM tree performance?,Why can the physical amount of data written to storage exceed the logical amount of data a client writes?
+What is read amplification in storage engines?,Why might a single logical query require touching more physical data than the size of its result?
+How does space amplification occur in compaction?,Why might the physical storage footprint of a dataset exceed its logical size?
+What are the different compaction strategies (leveled vs size-tiered)?,What design choices govern how background maintenance processes reorganize accumulated data files over time?
+How does a B+Tree differ from a B-Tree?,How do variations in tree node structure optimize for different access patterns like point lookups versus range scans?
+What is the role of the WAL in ensuring atomicity?,How do logging mechanisms guarantee that a set of changes either fully applies or has no effect at all?
+How do distributed databases achieve linearizability?,"What is the strongest consistency guarantee a distributed system can provide for concurrent operations, and what does it cost?"
+What is eventual consistency versus strong consistency?,What spectrum of consistency guarantees exists between systems that prioritize availability and systems that prioritize correctness?
+How does sharding improve database scalability?,How do systems scale storage and throughput horizontally beyond the capacity of a single machine?
+What is the difference between horizontal and vertical partitioning?,What are the different axes along which a dataset can be split for storage or performance purposes?
+How do database systems implement transaction isolation using locks?,How do systems use mutual exclusion mechanisms to prevent conflicting concurrent operations from corrupting shared state?
+What is optimistic concurrency control?,How can systems allow concurrent access to shared data without acquiring locks upfront?
+How does a skip list serve as an in-memory index structure?,What probabilistic data structures provide efficient ordered access as an alternative to balanced trees?
+What is the purpose of a fence pointer in SSTables?,"How do sorted, immutable on-disk file formats support fast key lookup without scanning the entire file?"
+How do databases balance durability and performance tradeoffs?,How do systems balance the cost of guaranteeing persistence against the throughput needed for real-time operations?
+What is the difference between synchronous and asynchronous replication?,What tradeoffs govern how quickly replicated changes must be confirmed before an operation is considered complete?

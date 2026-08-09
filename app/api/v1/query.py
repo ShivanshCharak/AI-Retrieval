@@ -8,8 +8,9 @@ import json
 from app.api.v1.ingestion import ingest
 from app.db.database import get_db
 from app.graph.graph import graph
-from app.graph.nodes import save_memory
+from app.graph.nodes.memory import save_memory
 from app.services.llm.llm_service import llm
+from app.graph.state import GraphState
 
 router = APIRouter()
 
@@ -54,6 +55,7 @@ async def query(
     db: Session = Depends(get_db),
 ):
     token = request.cookies.get("access_token")
+    state = GraphState()
     if not token:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
@@ -62,7 +64,6 @@ async def query(
 
     if file and file.size > 0:
         await ingest(file, user_id)
-    
 
     async def generate():
         final_state = None
@@ -96,11 +97,15 @@ async def query(
         if final_state is None:
             yield f"data: {json.dumps({'type':'error','message':'Graph execution failed'})}\n\n"
             return
-
         # Product route
         if final_state["route"] == "product":
             yield f"data: {json.dumps({'type':'token','content': final_state['answer']})}\n\n"
-            yield f"data: {json.dumps({'type':'complete'})}\n\n"
+            yield f"data: {json.dumps({
+                   'type': 'complete',
+                   'trace':final_state["trace"],
+
+           
+               })}\n\n"
             save_memory(
                 userId=user_id,
                 message=message,
@@ -111,7 +116,6 @@ async def query(
 
         # RAG route
         docs = final_state.get("reranked_docs", [])
-        print("doc", docs)
 
         context = "\n\n".join(
             (
@@ -150,7 +154,12 @@ async def query(
             db=db,
         )
 
-        yield f"data: {json.dumps({'type':'complete'})}\n\n"
+        yield f"data: {json.dumps({
+        'type': 'complete',
+        'confidence':final_state['trace'][0]['confidence'],
+        'latency_ms':final_state['trace'][0]['latency_ms']
+
+    })}\n\n"
 
     return StreamingResponse(
         generate(),

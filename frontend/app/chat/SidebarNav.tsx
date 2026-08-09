@@ -7,7 +7,7 @@ interface SidebarNavProps {
 
 export default function SidebarNav({ links, visibility }: SidebarNavProps) {
   return (
-    <div className="px-3 py-3 border-t  border-gray-100 space-y-0.5">
+    <div className="w-full px-4 border-t absolute bottom-[8rem]  border-gray-100 space-y-0.5">
       {links.map(({ label, icon: Icon }) => (
         <button
           key={label}

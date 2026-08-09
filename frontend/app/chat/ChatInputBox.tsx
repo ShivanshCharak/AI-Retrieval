@@ -4,6 +4,10 @@ import React, { useState, useRef, useEffect, SetStateAction } from "react";
 import { Paperclip, Globe, Mic, ArrowUp, Glasses } from "lucide-react";
 import { MODELS } from "@/data/constants";
 
+type TraceNode = {
+  node: string;
+  latency_ms: number;
+};
 interface ChatInputBoxProps {
   onSend?: (
     message: string,
@@ -18,14 +22,18 @@ interface ChatInputBoxProps {
   setMessage: React.Dispatch<React.SetStateAction<{role:"user"|"assistant";content: string, loading:boolean, file?:{name:string, type:string}}[]>>;
   webSearch?: boolean;
   setStatus: React.Dispatch<SetStateAction<{stage:string,title:string, description:string}[]>>
+  setTraceNode: React.Dispatch<SetStateAction<TraceNode[]>>
   status: string
+  
 }
+
 
 export default function ChatInputBox({
   onSend,
   chatting = false,
   setMessage,
   setChatting,
+  setTraceNode,
   setStatus,
 }: ChatInputBoxProps) {
   const [input, setInput] = useState("");
@@ -57,6 +65,8 @@ const res = await fetch("/api/chat", {
 if (!res.body) return;
 const reader = res.body!.getReader();
 const decoder = new TextDecoder();
+console.log(reader)
+
 
 let buffer = "";
 let answer = "";
@@ -74,6 +84,7 @@ while (true) {
     if (!event.startsWith("data: ")) continue;
 
     const data = JSON.parse(event.slice(6));
+
 
     switch (data.type) {
     case "progress":
@@ -117,8 +128,9 @@ while (true) {
         });
         break;
 
-      case "done":
-        console.log("Finished");
+      case "complete":
+        // console.log(data)
+        setTraceNode(data.trace)
         break;
     }
   }
@@ -137,7 +149,7 @@ while (true) {
 
   return (
     <div
-      className={` w-[1000px] bg-white rounded-2xl  shadow-sm border border-gray-200 overflow-hidden ${chatting ? "bottom-0 fixed" : ""}`}
+      className={` w-[70%] bg-white rounded-2xl  shadow-sm border border-gray-200 overflow-hidden ${chatting ? "bottom-0 fixed" : ""}`}
     >
       
       {/* Upgrade banner */}

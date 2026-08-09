@@ -1,0 +1,226 @@
+query,expected_route
+who are you,product
+what are you,product
+what can you do,product
+what do you do,product
+how do you work,product
+explain your architecture,product
+tell me about yourself,product
+what is this assistant,product
+how were you built,product
+what model are you running on,product
+are you a chatbot,product
+hi,product
+hello,product
+hey there,product
+good morning,product
+what do you need to start working,product
+what do you need from me to function,product
+what information do you require to begin,product
+how capable are you,product
+what are your limitations,product
+can you explain how you process my queries,product
+what kind of assistant is this,product
+are you a github code assistant,product
+what is your purpose,product
+what technology powers you,product
+describe your internal workflow,product
+how do you decide what to answer,product
+what's your name,product
+introduce yourself,product
+what makes you different from other assistants,product
+how were you trained,product
+what is your role here,product
+can you tell me what you are designed to do,product
+how do you handle my requests,product
+what happens when I ask you something,product
+how do you generate responses,product
+what is your system design,product
+how do you retrieve information,product
+what tools do you have access to,product
+yo,product
+sup,product
+how's it going,product
+are you an AI,product
+what version are you,product
+what is your knowledge base built from,product
+explain how you route my questions,product
+how smart are you,product
+what's your job,product
+who am I,rag
+tell me about myself,rag
+what do I like,rag
+what are my preferences,rag
+what did I ask you yesterday,rag
+do you remember my last question,rag
+what is my history with you,rag
+what do you know about me,rag
+what are my goals,rag
+what did I save earlier,rag
+what do I dislike,rag
+what is in my profile,rag
+what have I told you about my project,rag
+remind me what I was working on,rag
+what did I upload before,rag
+https://github.com/facebook/rocksdb,rag
+https://github.com/etcd-io/etcd,rag
+check this repo https://github.com/cockroachdb/cockroach,rag
+here is the link https://github.com/apache/cassandra,rag
+https://github.com/postgres/postgres explain this,rag
+look at https://github.com/mongodb/mongo,rag
+https://github.com/redis/redis,rag
+can you review https://github.com/tikv/tikv,rag
+what is a database storage engine,rag
+explain how storage engines work,rag
+what is a B-tree index,rag
+how does a B-tree index work in databases,rag
+explain LSM trees,rag
+what are LSM trees used for,rag
+what is write-ahead logging,rag
+how does WAL ensure durability,rag
+what is MVCC,rag
+explain multi-version concurrency control,rag
+what are ACID properties in databases,rag
+explain transactions in a database,rag
+what is concurrency control,rag
+explain locking protocols in databases,rag
+what is two-phase locking,rag
+how do recovery algorithms work,rag
+explain crash recovery in databases,rag
+what is buffer pool management,rag
+how does a buffer pool work,rag
+explain query execution in databases,rag
+what is query optimization,rag
+how does a query optimizer choose a plan,rag
+what is a distributed database,rag
+explain database replication,rag
+what is leader-follower replication,rag
+explain consensus algorithms,rag
+what is the Raft consensus algorithm,rag
+how does Paxos work,rag
+what are distributed transactions,rag
+explain two-phase commit,rag
+what is partitioning in databases,rag
+what is sharding,rag
+explain consistency models in distributed systems,rag
+what is eventual consistency,rag
+what is strong consistency,rag
+explain compaction strategies in LSM trees,rag
+how does database performance scale,rag
+what factors affect database scalability,rag
+how does indexing improve query performance,rag
+what is a clustered index,rag
+explain the difference between OLTP and OLAP,rag
+how does redis work,rag
+what is fastapi,rag
+what is langgraph,rag
+explain transformers,rag
+what is an llm,rag
+how does a hash index work,rag
+what is a write amplification problem,rag
+explain snapshot isolation,rag
+what is a checkpoint in database systems,rag
+how does replication lag occur,rag
+what is quorum-based replication,rag
+explain sharding key selection,rag
+what is a distributed lock manager,rag
+what's up,product
+howdy,product
+greetings,product
+can you introduce yourself,product
+what is this tool,product
+what is this application,product
+are you a code assistant,product
+what repo related tasks can you help with,product
+how do you index code,product
+how do you understand my codebase,product
+what languages can you help me code in,product
+do you have memory of previous conversations,product
+what happens behind the scenes when I chat with you,product
+how do you decide between rag and product routes,product
+what is your routing logic,product
+how accurate are you,product
+what kind of questions can I ask you,product
+are you connected to the internet,product
+can you access my files,product
+what's your context window,product
+how do you process a github link,product
+explain your retrieval pipeline,product
+what is your confidence score based on,product
+how do you log your traces,product
+what does your trace object store,product
+how do you measure latency,product
+what's your response time,product
+who created you,product
+which company built you,product
+what is your main function,product
+can you summarize your own workflow,product
+what happens if you don't know the answer,product
+how do you fall back when unsure,product
+what did I say earlier in this chat,rag
+what topics have I asked about so far,rag
+what is my current project about,rag
+summarize what I've told you today,rag
+what files have I shared with you,rag
+what is my coding experience level,rag
+what tech stack am I using,rag
+what database am I working with,rag
+what issue was I debugging earlier,rag
+https://github.com/pingcap/tidb,rag
+https://github.com/scylladb/scylla,rag
+take a look at https://github.com/citusdata/citus,rag
+https://github.com/yugabyte/yugabyte-db explain,rag
+review this https://github.com/vitessio/vitess,rag
+https://github.com/apache/kafka,rag
+https://github.com/elastic/elasticsearch,rag
+here's the repo https://github.com/timescale/timescaledb,rag
+what is a log-structured merge tree,rag
+how does compaction work in LSM trees,rag
+explain leveled compaction vs tiered compaction,rag
+what is a redo log,rag
+what is an undo log,rag
+how does write-ahead logging prevent data loss,rag
+explain optimistic concurrency control,rag
+explain pessimistic concurrency control,rag
+what is deadlock detection in databases,rag
+how do databases avoid deadlocks,rag
+what is a phantom read,rag
+explain isolation levels in transactions,rag
+what is read committed isolation,rag
+what is serializable isolation,rag
+how does a database achieve durability,rag
+explain the role of the WAL in crash recovery,rag
+what is checkpointing used for,rag
+how does a database recover after a crash,rag
+explain page caching in databases,rag
+what is a dirty page in buffer management,rag
+how does eviction work in a buffer pool,rag
+explain the cost-based query optimizer,rag
+how are query plans generated,rag
+what is a query execution plan,rag
+explain join algorithms in databases,rag
+what is a hash join,rag
+what is a merge join,rag
+explain nested loop joins,rag
+what is horizontal partitioning,rag
+what is vertical partitioning,rag
+explain range-based sharding,rag
+explain hash-based sharding,rag
+what is a consistent hashing algorithm,rag
+how does gossip protocol work in distributed systems,rag
+explain the CAP theorem,rag
+what is linearizability,rag
+explain causal consistency,rag
+what is a quorum read and write,rag
+how does leader election work in Raft,rag
+what is log replication in Raft,rag
+explain the difference between synchronous and asynchronous replication,rag
+what is multi-leader replication,rag
+explain conflict resolution in distributed databases,rag
+what is vector clock used for,rag
+how does a database ensure atomicity,rag
+what is snapshot isolation used for,rag
+explain database sharding vs partitioning,rag
+what is a distributed consensus protocol,rag
+how does zookeeper achieve consensus,rag
+what is the role of a coordinator in distributed transactions,rag

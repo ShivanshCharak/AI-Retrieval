@@ -134,14 +134,15 @@ def product_faq(state: GraphState):
         {query}
     """
     response = llm.with_structured_output(ProductfaqOutput).invoke(prompt)
+
     state["trace"].append(
         {
             "node": "product_faq",
             "latency_ms": (Time.time() - start) * 1000,
+            "confidence": response.confidence,
             "input": state["query"],
             "output": response.response,
-            "confidence": response.confidence,
         }
     )
 
-    return {**state, "answer": response.response, "confidence": response.confidence}
+    return {**state, "answer": response.response}

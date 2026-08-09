@@ -2,13 +2,10 @@ from langgraph.graph import StateGraph, END
 from app.graph.state import GraphState
 from app.services.query_translation.product_faq import product_faq
 
-from app.graph.nodes import (
-    generated_queries,
-    retrieval_node,
-    fusion_node,
-    rerank_nodes,
-    graph_router_node,
-)
+
+from app.graph.nodes.graph_router import graph_router_node
+from app.graph.nodes_med import generated_queries, fusion_node, rerank_nodes
+from app.graph.nodes.retrieval_node import retrieval_node
 
 workflow = StateGraph(GraphState)
 

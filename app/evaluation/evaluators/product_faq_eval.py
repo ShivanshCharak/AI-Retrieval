@@ -11,7 +11,7 @@ output = f"results/product_faq_eval_{timestamp}.csv"
 from app.db.qdrant_client_embedder import embedder
 from app.services.query_translation.product_faq import product_faq
 
-CSV_PATH = Path(__file__).parent / "product_faq_eval_expected_answers.csv"
+CSV_PATH = Path(__file__).parent / "datasets/product_faq_eval_expected_answers.csv"
 OUTPUT_PATH = Path(__file__).parent / "results/product_faq_eval_{timestamp}.csv"
 
 SEM_LIMIT = 20

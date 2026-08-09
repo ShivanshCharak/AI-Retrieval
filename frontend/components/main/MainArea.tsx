@@ -6,20 +6,31 @@ import QuickActions from "../../app/chat/QuickActions";
 import ReactMarkdown from "react-markdown";
 import { Paperclip } from "lucide-react";
 import remarkGfm from "remark-gfm";
+import { Copy, ThumbsDown, ThumbsUp, CloudLightning } from "lucide-react";
 
 import { useState } from "react";
 import { LoaderIcon } from "lucide-react";
+import { Check } from "lucide-react";
+import ResponseTime from "../tracenode";
 
 interface MainAreaProps {
   userName?: string;
   sidebarVisibility: boolean;
 }
+type TraceNode = {
+  node: string;
+  latency_ms: number;
+};
 
 export default function MainArea({
   userName = "Toby",
   sidebarVisibility,
 }: MainAreaProps) {
-  const [status, setStatus] = useState<{stage:string,title:string, description:string}[]>([]);
+  const [status, setStatus] = useState<
+    { stage: string; title: string; description: string }[]
+  >([]);
+  const [showCheck, setShowCheck] = useState<number | null>();
+  const [traceNode, setTraceNode] = useState<TraceNode[]>();
   const [message, setMessage] = useState<
     {
       role: "user" | "assistant";
@@ -68,31 +79,61 @@ export default function MainArea({
         {message.map((msg, i) => (
           <div
             key={i}
-            className={`px-3 py-2 rounded-lg text-sm w-fit max-w-[80%] ${
-              msg.role === "user"
-                ? "bg-black text-white ml-auto"
-                : "bg-gray-200 text-black mr-auto"
+            className={`w-full flex flex-col ${
+              msg.role === "user" ? "items-end" : "items-start"
             }`}
           >
-            {msg.loading ? (
-              <div className=" flex justify-around">
-                <LoaderIcon className="animate-spin" />
+            {/* Message bubble */}
+            <div
+              className={`px-3 py-2 rounded-lg text-sm w-fit max-w-[80%] ${
+                msg.role === "user"
+                  ? "bg-black text-white"
+                  : "bg-gray-200 text-black"
+              }`}
+            >
+              {msg.loading ? (
+                <LoaderIcon className="animate-spin" size={16} />
+              ) : (
+                <>
+                  {msg.role === "user" && msg.file && (
+                    <div className="mb-2 flex items-center gap-2 rounded-lg border border-gray-500 bg-gray-800 px-3 py-2 w-fit">
+                      <Paperclip size={14} />
+                      <span>{msg.file.name}</span>
+                    </div>
+                  )}
 
-         
-              </div>
-            ) : (
-              <>
-                {msg.role === "user" && msg.file && (
-                  <div className="mb-2 flex items-center gap-2 rounded-lg border border-gray-500 bg-gray-800 px-3 py-2 w-fit">
-                    <Paperclip size={14} />
-                    <span>{msg.file.name}</span>
-                  </div>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {msg.content}
+                  </ReactMarkdown>
+                </>
+              )}
+            </div>
+            {msg.role === "assistant" && !msg.loading && (
+              <div className="flex items-center gap-2 mt-2 items-start">
+                {[Copy, ThumbsDown, ThumbsUp, CloudLightning].map(
+                  (Icon, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setShowCheck(index);
+
+                        setTimeout(() => {
+                          setShowCheck(null);
+                        }, 1500);
+                      }}
+                      className="bg-transparent hover:bg-gray-200 p-1 rounded-sm cursor-pointer"
+                    >
+                      {showCheck === index ? (
+                        <Check size={16} />
+                      ) : (
+                        <Icon size={16} />
+                      )}
+                    </button>
+                  ),
                 )}
 
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {msg.content}
-                </ReactMarkdown>
-              </>
+                {traceNode && <ResponseTime trace={traceNode} />}
+              </div>
             )}
           </div>
         ))}
@@ -103,6 +144,7 @@ export default function MainArea({
         setMessage={setMessage}
         chatting={isChatting}
         setChatting={setIsChatting}
+        setTraceNode={setTraceNode}
         status={status}
         setStatus={setStatus}
       />

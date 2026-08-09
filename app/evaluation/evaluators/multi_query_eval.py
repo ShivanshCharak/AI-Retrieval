@@ -14,7 +14,7 @@ SIMILARITY_THRESHOLD = 0.60
 
 timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-CSV_PATH = Path(__file__).parent / "multi_query_eval_expected_answers.csv"
+CSV_PATH = Path(__file__).parent / "datasets/multi_query_eval_expected_answers.csv"
 OUTPUT_PATH = Path(__file__).parent / f"results/multi_query_eval_{timestamp}.csv"
 
 semaphore = asyncio.Semaphore(SEM_LIMIT)
