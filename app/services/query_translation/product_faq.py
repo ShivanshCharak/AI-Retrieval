@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from app.services.llm.llm_service import llm
 import time as Time
+from langgraph.config import get_stream_writer
 from app.graph.state import GraphState
 
 
@@ -12,6 +13,9 @@ class ProductfaqOutput(BaseModel):
 def product_faq(state: GraphState):
     start = Time.time()
     query = state["query"]
+    writer = get_stream_writer()
+    prv_len = 0
+    final_obj = None
     prompt = f"""
     As an ai agent,your primary responsibility is to answer user queries about this AI Retrieval & GitHub Code Assistant using ONLY the information provided below.
     
@@ -133,7 +137,7 @@ def product_faq(state: GraphState):
         Query:-
         {query}
     """
-    response = llm.with_structured_output(ProductfaqOutput).invoke(prompt)
+    structured__llm = llm.with_structured_output(ProductfaqOutput).invoke(prompt)
 
     state["trace"].append(
         {

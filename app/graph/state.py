@@ -1,16 +1,23 @@
 from typing import TypedDict, List
 
 
-class GraphState(TypedDict):
+class GraphState(TypedDict, total=False):
     query: str
-    query_type: str
-    generated_queries: List[str]
-    documents: List[dict]
-    reranked_docs: List[dict]
-    answer: str
-    route: str
+    userId: int
+
     web_search: bool
-    userId: str
     deep_search: bool
 
-    trace: List[dict]
+    route: str
+
+    generated_queries: list
+    documents: list
+    reranked_docs: list
+
+    answer: str
+
+    trace: list
+
+    # Guardrails
+    blocked: bool
+    block_reason: str

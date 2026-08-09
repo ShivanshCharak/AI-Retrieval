@@ -1,5 +1,6 @@
 # services/ingestion/ingestion_service.py
 
+from app.db.qdrant_client_embedder import vector_store
 from .loader import document_loader
 import time
 
@@ -50,7 +51,5 @@ def store_chunks(chunks):
     texts = [chunk.page_content for chunk in chunks]
 
     start = time.perf_counter()
-    vectors = embedder.embed_documents(texts)
+    vector_store.add_documents(chunks)
     print(f"Embedding only: {time.perf_counter() - start:.2f}s")
-
-    print(f"Generated {len(vectors)} vectors")

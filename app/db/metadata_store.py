@@ -10,6 +10,6 @@ def store_collection_metadata(metadata, userId):
 
 
 def get_collection_metadata():
-
-    with open("collection_metadata.json", "r") as f:
+    METADATA_DIR = Path(__file__).parent
+    with open(METADATA_DIR / f"metadata/collection_metadata_{4}.json", "r") as f:
         return json.load(f)

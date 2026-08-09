@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Info } from "lucide-react";
 
 type TraceNode = {
   node: string;
@@ -16,6 +17,8 @@ export default function ResponseTime({ trace }: { trace: TraceNode[] }) {
 
   return (
     <div className="w-full max-w-2xl">
+      
+
       {/* Response time */}
       <button
         onClick={() => setOpen(!open)}
@@ -42,7 +45,8 @@ export default function ResponseTime({ trace }: { trace: TraceNode[] }) {
                 </div>
 
             
-                <div className="flex-1 flex justify-between text-xs pb-4">
+                <div className="flex-1  items-center flex justify-between text-xs pb-4">
+                  
                   <span className="font-medium">{item.node}</span>
 
                   <span className="text-gray-500">

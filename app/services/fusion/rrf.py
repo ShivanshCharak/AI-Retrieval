@@ -34,5 +34,4 @@ def reciprocal_rank_fusion(documents, k: int = 60):
 
     fused_docs.sort(key=lambda x: x["score"], reverse=True)
 
-    print("fused", fused_docs)
     return fused_docs

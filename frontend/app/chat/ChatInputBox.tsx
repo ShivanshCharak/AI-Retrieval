@@ -86,53 +86,136 @@ while (true) {
     const data = JSON.parse(event.slice(6));
 
 
-    switch (data.type) {
-    case "progress":
+ switch (data.type) {
 
-      setStatus(prev => {
+  case "progress":
 
-          const exists = prev.find(
-              p => p.stage === data.stage
-          );
+    setStatus(prev => {
 
-          if (exists) return prev;
+      const exists = prev.find(
+        p => p.stage === data.stage
+      );
 
-          return [
-              ...prev,
-              {
-                  stage: data.stage,
-                  title: data.title,
-                  description: data.description
-              }
-          ];
+      if (exists) return prev;
 
-      });
+      return [
+        ...prev,
+        {
+          stage: data.stage,
+          title: data.title,
+          description: data.description
+        }
+      ];
 
-      break;
+    });
 
-      case "token":
-        answer += data.content;
+    break;
 
-        setMessage(prev => {
-          const updated = [...prev];
-          updated[updated.length - 1] = {
-            role: "assistant",
-            content: answer,
-            loading: false,
-            file:file?{
+
+  case "token":
+
+    answer += data.content;
+
+    setMessage(prev => {
+
+      const updated = [...prev];
+
+      updated[updated.length - 1] = {
+        role: "assistant",
+        content: answer,
+        loading: false,
+        file: file
+          ? {
               name: file.name,
               type: file.type
-            }:undefined
-          };
-          return updated;
-        });
-        break;
+            }
+          : undefined
+      };
 
-      case "complete":
-        // console.log(data)
-        setTraceNode(data.trace)
-        break;
-    }
+      return updated;
+
+    });
+
+    break;
+
+
+  case "guardrail":
+
+    console.log("🚫 Guardrail:", data);
+
+    // Stop loading state
+    setMessage(prev => {
+
+      const updated = [...prev];
+
+      updated[updated.length - 1] = {
+        role: "assistant",
+        content: data.message || "Request blocked by guardrail.",
+        loading: false,
+        blocked: true,
+        file: file
+          ? {
+              name: file.name,
+              type: file.type
+            }
+          : undefined
+      };
+
+      return updated;
+
+    });
+
+    // Optional: show the guardrail as a status
+    setStatus(prev => [
+      ...prev,
+      {
+        stage: "guardrail",
+        title: "Request blocked",
+        description: data.message || "This request was blocked."
+      }
+    ]);
+
+    // Stop consuming the stream
+    return;
+
+
+  case "complete":
+
+    console.log("COMPLETE:", data);
+
+    setTraceNode(data.trace || []);
+
+    break;
+
+
+  case "error":
+
+    console.error("Stream error:", data);
+
+    setMessage(prev => {
+
+      const updated = [...prev];
+
+      updated[updated.length - 1] = {
+        role: "assistant",
+        content: data.message || "Something went wrong.",
+        loading: false,
+        error: true
+      };
+
+      return updated;
+
+    });
+
+    break;
+
+
+  default:
+
+    console.log("Unknown SSE event:", data);
+
+    break;
+}
   }
 }
   };

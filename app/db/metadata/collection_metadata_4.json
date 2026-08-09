@@ -1,25 +1,15 @@
 {
-  "summary": "Database Internals is a comprehensive technical reference covering the architecture and implementation of modern database management systems. It explores storage engines, indexing structures, transaction processing, concurrency control, distributed systems, replication, consensus algorithms, query execution, and durability mechanisms. The material emphasizes how databases are designed under real-world constraints, explaining the trade-offs behind scalable, fault-tolerant, and high-performance database systems.",
+  "summary": "The document outlines a technical assessment for a frontend developer at VectorShift, requiring implementation of JavaScript/React for the frontend and Python/FastAPI for the backend. The assessment includes four parts, with specific requirements for the Text node logic (dynamic sizing and variable insertion) and backend integration. The frontend must run using npm i and npm start, while the backend uses uvicorn main:app --reload. The document emphasizes collaboration between frontend and backend, with detailed instructions for code modifications and testing.",
   "topics": [
-    "Database Storage Engines",
-    "B-Tree Indexes",
-    "LSM Trees",
-    "Write-Ahead Logging (WAL)",
-    "MVCC (Multi-Version Concurrency Control)",
-    "Transactions & ACID",
-    "Concurrency Control",
-    "Locking Protocols",
-    "Recovery Algorithms",
-    "Buffer Pool Management",
-    "Query Execution",
-    "Query Optimization",
-    "Distributed Databases",
-    "Replication",
-    "Consensus Algorithms (Raft, Paxos)",
-    "Distributed Transactions",
-    "Partitioning & Sharding",
-    "Consistency Models",
-    "Compaction Strategies",
-    "Database Performance & Scalability"
+    "Frontend Technical Assessment",
+    "JavaScript/React for Frontend",
+    "Python/FastAPI for Backend",
+    "Assessment Structure (4 Parts)",
+    "Text Node Logic (Dynamic Sizing & Variable Insertion)",
+    "Backend Integration Requirements",
+    "Folder Structure (frontend/src, backend)",
+    "Code Execution Instructions (npm i, npm start, uvicorn)",
+    "Text Node Example Usage",
+    "Integration Task Details"
   ]
 }
