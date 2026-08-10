@@ -1,50 +1,25 @@
 import ast
 
 
-def extract_symbols(tree: ast.AST, source):
-
+def extract_symbols(tree: ast.AST, source: str):
     symbols = []
-
-    calls = []
-    returns = []
-    raises = []
 
     for node in ast.walk(tree):
 
-        # Classes
         if isinstance(node, ast.ClassDef):
-
             symbols.append(
                 {
                     "type": "class",
                     "name": node.name,
                     "line": node.lineno,
                     "end_line": getattr(node, "end_lineno", node.lineno),
-                    "bases": [ast.unparse(base) if hasattr(ast, "unparse") else None for base in node.bases],
-                    "decorators": [ast.unparse(d) if hasattr(ast, "unparse") else None for d in node.decorator_list],
+                    "bases": [ast.unparse(base) for base in node.bases],
+                    "decorators": [ast.unparse(d) for d in node.decorator_list],
                     "docstring": ast.get_docstring(node),
                     "source": ast.get_source_segment(source, node),
                 }
             )
 
-        # Normal functions
-        elif isinstance(node, ast.FunctionDef):
-
-            symbols.append(
-                {
-                    "type": "function",
-                    "name": node.name,
-                    "line": node.lineno,
-                    "end_line": getattr(node, "end_lineno", node.lineno),
-                    "args": [a.arg for a in node.args.args],
-                    "returns": (ast.unparse(node.returns) if node.returns and hasattr(ast, "unparse") else None),
-                    "decorators": [ast.unparse(d) if hasattr(ast, "unparse") else None for d in node.decorator_list],
-                    "docstring": ast.get_docstring(node),
-                    "source": ast.get_source_segment(source, node),
-                }
-            )
-
-        # Async functions
         elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
 
             calls = []
@@ -63,10 +38,7 @@ def extract_symbols(tree: ast.AST, source):
 
                 elif isinstance(child, ast.Return):
 
-                    if child.value:
-                        returns.append(ast.unparse(child.value))
-                    else:
-                        returns.append(None)
+                    returns.append(ast.unparse(child.value) if child.value else None)
 
                 elif isinstance(child, ast.Raise):
 
@@ -75,12 +47,18 @@ def extract_symbols(tree: ast.AST, source):
 
             symbols.append(
                 {
-                    "type": "async_function" if isinstance(node, ast.AsyncFunctionDef) else "function",
+                    "type": (
+                        "async_function"
+                        if isinstance(node, ast.AsyncFunctionDef)
+                        else "function"
+                    ),
                     "name": node.name,
                     "line": node.lineno,
                     "end_line": getattr(node, "end_lineno", node.lineno),
                     "args": [a.arg for a in node.args.args],
-                    "returns_annotation": (ast.unparse(node.returns) if node.returns else None),
+                    "returns_annotation": (
+                        ast.unparse(node.returns) if node.returns else None
+                    ),
                     "returns": returns,
                     "raises": raises,
                     "calls": sorted(set(calls)),
