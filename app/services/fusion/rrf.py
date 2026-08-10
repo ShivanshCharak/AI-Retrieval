@@ -1,37 +1,53 @@
 from collections import defaultdict
-import json
 
 
 def reciprocal_rank_fusion(documents, k: int = 60):
     scores = defaultdict(float)
     doc_lookup = {}
-    print("documents", documents, type(documents))
-    content = ""
 
     for rank, doc in enumerate(documents):
-        if "id" in doc:
-            content = doc.get("id")
+        # LangChain Document
+        if hasattr(doc, "metadata"):
+            doc_id = doc.metadata.get("id")
+
+            # Fallback if metadata id doesn't exist
+            if not doc_id:
+                doc_id = doc.page_content
+
+        # Dictionary support, if you ever have dicts
+        elif isinstance(doc, dict):
+            doc_id = doc.get("id") or doc.get("content")
+
         else:
-            content = doc.get("content")
+            continue
 
-        if isinstance(content, dict):
-            key = json.dumps(content, sort_keys=True)
-            print(key)
-        else:
-            key = content
+        scores[doc_id] += 1 / (k + rank + 1)
 
-        scores[key] += 1 / (k + rank + 1)
-
-        # Keep the original document
-        doc_lookup[key] = doc
+        # Keep original Document
+        doc_lookup[doc_id] = doc
 
     fused_docs = []
 
-    for key, score in scores.items():
-        fused_doc = doc_lookup[key].copy()
-        fused_doc["score"] = score
+    for doc_id, score in scores.items():
+        doc = doc_lookup[doc_id]
+
+        # Don't mutate the original Document
+        if hasattr(doc, "metadata"):
+            fused_doc = doc.model_copy(deep=True)
+            fused_doc.metadata["rrf_score"] = score
+        else:
+            fused_doc = doc.copy()
+            fused_doc["score"] = score
+
         fused_docs.append(fused_doc)
 
-    fused_docs.sort(key=lambda x: x["score"], reverse=True)
+    fused_docs.sort(
+        key=lambda doc: (
+            doc.metadata.get("rrf_score", 0)
+            if hasattr(doc, "metadata")
+            else doc.get("score", 0)
+        ),
+        reverse=True,
+    )
 
     return fused_docs

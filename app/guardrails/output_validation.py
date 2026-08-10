@@ -4,12 +4,13 @@ from app.graph.state import GraphState
 
 
 def validate_output(state: GraphState):
+    print("state", state)
     prompt = f"""
     Task: Check if there is unsafe content in the AI assistant's response according to the safety policy.
 
     <BEGIN CONVERSATION>
     Assistant:
-    {state['answer']}
+    {state['documents']}
     <END CONVERSATION>
     """
     response = guard.invoke(prompt)
@@ -20,8 +21,7 @@ def validate_output(state: GraphState):
         "output_guard_result": {
             "is_safe": is_safe,
             "raw": response.content,
-            "duration": response.response_metadata.total_duration,
         },
         "blocked": not is_safe,
-        "answer": state["answer"] if is_safe else "I can't share that response.",
+        "answer": state["documents"] if is_safe else "I can't share that response.",
     }

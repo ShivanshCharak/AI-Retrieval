@@ -6,11 +6,11 @@ from app.services.retrieval.vector_search import vector_search
 import time
 
 from app.services.retrieval.memory_search import memory_search
-from app.services.retrieval.github_search import github_search
+from app.services.retrieval.github_search import github_parser
 
 
 class RetrievalDecision(BaseModel):
-    explanation: str
+    explaination: str
     use_memory: bool
     use_vector: bool
     use_graph: bool
@@ -170,11 +170,12 @@ def retrieval_node(state):
             docs.extend(memory_search(q, userId))
             # print("going to use memeory")
         if plan.use_vector:
-            docs.extend(vector_search(q, userId=userId))
+            docs.extend(vector_search(state, q, userId=userId))
         if plan.use_repo:
-            docs.extend(github_search(q, userId=userId))
+            docs.extend(github_parser(state, userId=userId))
         # if not plan.use_vector and not plan.use_memory and not plan.use_graph:
         #     docs.extend(intro(q))
+        print("docs", docs)
 
         # if plan.use_graph:
         # docs.extend(graph_search(q))

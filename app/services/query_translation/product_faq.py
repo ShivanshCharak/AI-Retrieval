@@ -137,7 +137,7 @@ def product_faq(state: GraphState):
         Query:-
         {query}
     """
-    structured__llm = llm.with_structured_output(ProductfaqOutput).invoke(prompt)
+    response = llm.with_structured_output(ProductfaqOutput).invoke(prompt)
 
     state["trace"].append(
         {

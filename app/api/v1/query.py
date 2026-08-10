@@ -261,8 +261,8 @@ async def query(
 
             context = "\n\n".join(
                 (
-                    json.dumps(doc["content"])
-                    if isinstance(doc.get("content"), dict)
+                    doc.page_content
+                    if hasattr(doc, "page_content")
                     else str(doc.get("content", ""))
                 )
                 for doc in docs
@@ -320,6 +320,11 @@ Context:
                         'content': token,
                     })}\n\n")
 
+                yield (f"data: {json.dumps({
+                                    'type': 'complete',
+                                    'trace': final_state.get("trace", []),
+                                }, default=str)}\n\n")
+
             # =========================================
             # SAVE MEMORY
             # =========================================
@@ -357,7 +362,7 @@ Context:
                     'confidence': confidence,
                     'latency_ms': latency_ms,
                     'trace': trace,
-                })}\n\n")
+                },default=str)}\n\n")
 
             return
 
