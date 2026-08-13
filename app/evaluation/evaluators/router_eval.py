@@ -23,7 +23,6 @@ async def evaluate_row(row):
         expected = row["expected_route"]
 
         try:
-            # Run synchronous router without blocking event loop
             result = await asyncio.to_thread(
                 graph_router_node,
                 query,

@@ -6,7 +6,7 @@ from app.services.query_translation.product_faq import product_faq
 from app.graph.nodes.graph_router import graph_router_node
 from app.graph.nodes_med import generated_queries, fusion_node, rerank_nodes
 from app.graph.nodes.retrieval_node import retrieval_node
-from app.graph.nodes.guardrail_node import input_guard_node, output_guard_node
+from app.graph.nodes.guardrail_node import input_guard_node
 
 workflow = StateGraph(GraphState)
 
@@ -36,7 +36,7 @@ def route_after_input_guard(state):
 
 workflow.add_node("query_generation", generated_queries)
 workflow.add_node("input_guard", input_guard_node)
-workflow.add_node("output_guard", output_guard_node)
+
 
 workflow.set_entry_point("input_guard")
 workflow.add_conditional_edges(
@@ -65,12 +65,8 @@ workflow.add_edge("retrieval", "fusion")
 
 workflow.add_edge("fusion", "rerank")
 
-workflow.add_edge("product_faq", "output_guard")
-workflow.add_edge(
-    "rerank", "output_guard"
-)  # only if rerank result feeds a final answer directly;
-# otherwise put output_guard after your RAG generation step instead
-workflow.add_edge("output_guard", END)
+workflow.add_edge("product_faq", END)
+workflow.add_edge("rerank", END)
 
 workflow.add_conditional_edges(
     "router",

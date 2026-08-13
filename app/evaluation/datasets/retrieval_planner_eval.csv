@@ -1,0 +1,101 @@
+id,query,expected_use_memory,expected_use_vector,expected_use_graph,expected_use_repo
+1,Who am I?,True,False,False,False
+2,Tell me about myself.,True,False,False,False
+3,Describe me.,True,False,False,False
+4,What do you know about me?,True,False,False,False
+5,Summarize my profile.,True,False,False,False
+6,Summarize my qualifications.,True,False,False,False
+7,Summarize my experience.,True,False,False,False
+8,Generate a bio about me.,True,False,False,False
+9,Write an introduction about me for a conference.,True,False,False,False
+10,I am applying for a new job. Can you summarize what I do?,True,False,False,False
+11,What are my hobbies?,True,False,False,False
+12,Where am I from?,True,False,False,False
+13,What is my occupation?,True,False,False,False
+14,How old am I?,True,False,False,False
+15,What do I like to eat?,True,False,False,False
+16,What do I dislike?,True,False,False,False
+17,What is my sex?,True,False,False,False
+18,What's my favorite movie genre?,True,False,False,False
+19,Do I have any siblings?,True,False,False,False
+20,What city do I currently live in?,True,False,False,False
+21,What are my career goals?,True,False,False,False
+22,What's my educational background?,True,False,False,False
+23,Write a short bio for my Twitter profile.,True,False,False,False
+24,Draft an "About Me" section for my personal website.,True,False,False,False
+25,Create a LinkedIn summary for me.,True,False,False,False
+26,What programming languages do I usually work with?,True,False,False,False
+27,Remind me what I told you about my dietary preferences.,True,False,False,False
+28,What did I say my favorite color was?,True,False,False,False
+29,Based on what you know about me,True,True,False,False,False
+30,Recommend a gift for myself based on my interests.,True,False,False,False
+31,I just moved into a new apartment downtown.,True,False,False,False
+32,I am a software engineer.,True,False,False,False
+33,I like football.,True,False,False,False
+34,My favorite language is Go.,True,False,False,False
+35,I live in Pune.,True,False,False,False
+36,I just adopted a puppy!,True,False,False,False
+37,My birthday is next week.,True,False,False,False
+38,I recently switched jobs to a startup.,True,False,False,False
+39,I'm 29 years old.,True,False,False,False
+40,I don't really like spicy food.,True,False,False,False
+41,I watched a great documentary last night.,True,False,False,False
+42,Thanks,True,False,False,False,False
+43,The weather has been pretty nice this week.,True,False,False,False
+44,That's a great point,False,False,False,False,False
+45,I'm thinking about picking up a new hobby soon.,True,False,False,False
+46,What is the capital of France?,False,True,False,False
+47,Explain how photosynthesis works.,False,False,False,False
+48,What year did World War II end?,False,False,False,False
+49,How do I boil an egg?,False,False,False,False
+50,What's the difference between TCP and UDP?,False,False,False,False
+51,What does the book say about how databases organize data on disk?,False,True,False,False
+52,Summarize what the book explains about B-tree indexing.,False,True,False,False
+53,What are the main ideas behind log-structured storage in the book?,False,True,False,False
+54,Explain what the book says about write-ahead logging.,False,True,False,False
+55,According to the book, how do databases recover after a crash?,False,True,False,False
+56,What transaction guarantees does the book describe?,False,True,False,False
+57,Summarize the book's explanation of concurrency control.,False,True,False,False
+58,What isolation levels does the book discuss?,False,True,False,False
+59,What does the book say about multi-version concurrency control?,False,True,False,False
+60,How does the book describe query execution?,False,True,False,False
+61,What query optimization strategies are covered in the book?,False,True,False,False
+62,Summarize the replication architectures discussed in the book.,False,True,False,False
+63,What does the book say about leader-based vs leaderless replication?,False,True,False,False
+64,How does the book explain partitioning and sharding?,False,True,False,False
+65,What distributed transaction mechanisms does the book cover?,False,True,False,False
+66,What consensus mechanisms are described in the book?,False,True,False,False
+67,What consistency models does the book discuss for distributed databases?,False,True,False,False
+68,Summarize the performance trade-offs the book describes between sequential and random I/O.,False,True,False,False
+69,What overall database architecture does the book describe at a high level?,False,True,False,False
+70,Give me a chapter-by-chapter style summary of the book's topics.,False,True,False,False
+71,Based on my current project and what the book says about MVCC, should I use it for my use case?,True,True,False,False
+72,Given my background, which chapters of the book should I focus on first?,True,True,False,False
+73,I'm designing a system - using what the book teaches, how should I evaluate my options?,True,True,False,False
+74,How does the book relate write-ahead logging to crash recovery mechanisms?,False,True,True,False
+75,How does the book connect indexing structures to query execution performance?,False,True,True,False
+76,What relationship does the book draw between replication and consistency guarantees?,False,True,True,False
+77,How does the book relate partitioning to distributed transaction coordination?,False,True,True,False
+78,According to the book, how are consensus protocols connected to leader-based replication?,False,True,True,False
+79,How does the book relate concurrency control mechanisms to isolation levels?,False,True,True,False
+80,Explain this function in the codebase.,False,False,False,True
+81,Where is auth implemented?,False,False,False,True
+82,Which file contains RBAC logic?,False,False,False,True
+83,Show me where redis is used in the code.,False,False,False,True
+84,How does this code handle streaming data?,False,False,False,True
+85,How is JWT validated in this project?,False,False,False,True
+86,Which endpoint calls this function?,False,False,False,True
+87,Which modules depend on the auth module in this repo?,False,False,False,True
+88,What does this class constructor do?,False,False,False,True
+89,Where is the database connection initialized?,False,False,False,True
+90,Show me the middleware chain for incoming requests.,False,False,False,True
+91,Which tests cover the payment module?,False,False,False,True
+92,What does the error handling look like in the API layer?,False,False,False,True
+93,Find where environment variables are loaded in this project.,False,False,False,True
+94,How is caching implemented in this repo?,False,False,False,True
+95,Which functions call the login handler?,False,False,False,True
+96,Does my project's database layer implement write-ahead logging the way the book describes, and how do the recovery functions call each other?,False,True,True,True
+97,How does the replication design in the book relate to my own project's architecture, and how does that connect to concurrency trade-offs I care about?,True,True,True,False
+98,Compare how the book describes B-tree indexing with how my actual codebase implements its index.,False,True,False,True
+99,I just finished reading a great sci-fi novel.,False,False,False,False
+100,What's my favorite programming language?,True,False,False,False

@@ -9,7 +9,6 @@ def reciprocal_rank_fusion(documents, k: int = 60):
         # LangChain Document
         if hasattr(doc, "metadata"):
             doc_id = doc.metadata.get("id")
-
             # Fallback if metadata id doesn't exist
             if not doc_id:
                 doc_id = doc.page_content
@@ -17,7 +16,6 @@ def reciprocal_rank_fusion(documents, k: int = 60):
         # Dictionary support, if you ever have dicts
         elif isinstance(doc, dict):
             doc_id = doc.get("id") or doc.get("content")
-
         else:
             continue
 
@@ -30,9 +28,8 @@ def reciprocal_rank_fusion(documents, k: int = 60):
 
     for doc_id, score in scores.items():
         doc = doc_lookup[doc_id]
-
-        # Don't mutate the original Document
         if hasattr(doc, "metadata"):
+
             fused_doc = doc.model_copy(deep=True)
             fused_doc.metadata["rrf_score"] = score
         else:

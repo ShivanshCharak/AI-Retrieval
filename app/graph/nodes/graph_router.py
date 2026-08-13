@@ -1,98 +1,220 @@
+import re
 import time as Time
-from app.services.llm.llm_service import llm
-from pydantic import BaseModel, Field
 from typing import Literal
-from app.db.metadata_store import get_collection_metadata
+
+import json
+from pydantic import BaseModel, Field
 from langchain_core.messages import SystemMessage
+
+from app.services.llm.llm_service import llm
+from app.db.metadata_store import get_collection_metadata
+from app.services.retrieval.github_search import _scope_key
 
 
 class RouteDecision(BaseModel):
-    # Order matters for structured generation: reasoning must come
-    # before route/confidence so the label is conditioned on the reasoning,
-    # not the other way around (avoids post-hoc rationalization).
     explanation: str = Field(
         description=(
-            "One sentence: identify whether the query refers to (a) the assistant itself, "
-            "(b) the user's own data/history, or (c) a subject/entity described in the Metadata. "
-            "State which one and why, before choosing a route."
+            "One sentence explaining why the query is routed as " "rag or product."
         )
     )
     route: Literal["rag", "product"]
     confidence: float
 
 
+# ============================================================
+# DETERMINISTIC ROUTING HELPERS
+# ============================================================
+
+GITHUB_URL_PATTERN = re.compile(
+    r"https?://(?:www\.)?github\.com/[^\s]+",
+    re.IGNORECASE,
+)
+
+
+DOCUMENT_REFERENCE_PATTERNS = (
+    "uploaded document",
+    "uploaded pdf",
+    "uploaded file",
+    "uploaded files",
+    "the uploaded document",
+    "the uploaded pdf",
+    "the uploaded file",
+    "this document",
+    "this pdf",
+    "this file",
+    "the document",
+    "the pdf",
+    "from the document",
+    "from the pdf",
+    "from the file",
+    "from my document",
+    "from my pdf",
+    "from my file",
+    "based on the document",
+    "based on the pdf",
+    "based on the file",
+    "according to the document",
+    "according to the pdf",
+    "according to the file",
+)
+
+
+def contains_github_url(query: str) -> bool:
+    return bool(GITHUB_URL_PATTERN.search(query))
+
+
+def contains_document_reference(query: str) -> bool:
+    query = query.lower()
+
+    return any(phrase in query for phrase in DOCUMENT_REFERENCE_PATTERNS)
+
+
+def deterministic_route(query: str):
+    """
+    Return (route, explanation) when the query can be
+    safely classified without an LLM.
+
+    Return None when semantic classification is required.
+    """
+
+    if contains_github_url(query):
+        return (
+            "rag",
+            "The query contains a GitHub URL, so it must use repository retrieval.",
+        )
+
+    if contains_document_reference(query):
+        return (
+            "rag",
+            "The query explicitly asks for information from an uploaded document or file.",
+        )
+
+    return None
+
+
+# ============================================================
+# GRAPH ROUTER
+# ============================================================
+
+
 def graph_router_node(state):
     start = Time.time()
+
+    query = state["query"]
+
+    # --------------------------------------------------------
+    # 1. DETERMINISTIC ROUTING
+    # --------------------------------------------------------
+
+    deterministic = deterministic_route(query)
+
+    if deterministic is not None:
+        route, explanation = deterministic
+
+        latency = (Time.time() - start) * 1000
+
+        print("DETERMINISTIC ROUTE:", route)
+        print("CONFIDENCE:", 1.0)
+        print("EXPLANATION:", explanation)
+
+        state["trace"].append(
+            {
+                "node": "router",
+                "latency_ms": latency,
+                "confidence": 1.0,
+                "explanation": explanation,
+                "input": query,
+                "output": route,
+                "routing_type": "deterministic",
+            }
+        )
+
+        return {
+            **state,
+            "route": route,
+            "confidence": 1.0,
+        }
+
+    # --------------------------------------------------------
+    # 2. LLM ROUTING
+    # --------------------------------------------------------
 
     structured_llm = llm.with_structured_output(RouteDecision)
 
     metadata = get_collection_metadata()
 
+    with open(f"scope_cache/{_scope_key(state['userId'])}.json") as f:
+        repo_metadata = json.load(f)
+
     static_instruction = f"""
-    You are a routing agent.
+You are a routing agent.
 
-    Your job is to classify the user's query into exactly one category.
+Your job is to classify the user's query into exactly ONE category:
 
-    PRONOUN RULE:
-    - "you", "your", or "yourself" refers to the AI assistant.
-    - "me", "my", or "myself" refers to the user.
+- PRODUCT
+- RAG
 
-    ENTITY RULE (check this before matching PRODUCT examples on surface wording):
-    - If the query refers to a specific person, entity, or subject (by name or
-      description) that is NOT the assistant and NOT the user, check whether that
-      person/entity/subject is described in the Metadata below.
-    - If yes, classify as RAG — the query is asking about content in the knowledge
-      base assign it as rag examples.Metadata relevance takes priority over superficial similarity to PRODUCT examples.
-    - if query has given you a github link either t has gave you a question with it or not assign it as rag
-    - Example pattern: "what does [person mentioned in metadata] do" -> rag
-      (because it asks about a subject described in Metadata, not about the assistant)
-    
+Apply these rules:
 
-    Return exactly one route:
+1. USER DATA
 
-    PRODUCT:
-    - Questions about the AI assistant itself
-    - Architecture
-    - System design
-    - How the system works
-    - Models
-    - Capabilities
-    - Greetings and conversational wishes
+If the user asks about their own:
+- data
+- preferences
+- memories
+- history
+- saved information
+- profile
+- goals
 
-    Examples:
-    - "how do you work" -> product
-    - "what does this system use" -> product
-    - "hello" -> product
-    - "what model are you running" -> product
+classify as RAG.
 
-    RAG:
-    - User's own data
-    - Preferences
-    - Likes/dislikes
-    - Memories
-    - History
-    - Saved items
-    - Goals
-    - any attached document, pdf
-    - Profile
-    - Saved/stored GitHub links
-    - Any subject, person, or topic described in the Metadata below
-    - Knowledge/information that should be retrieved from the connected knowledge base
+2. KNOWLEDGE BASE
 
-    Examples:
-    - "what are my saved preferences" -> rag
-    - "what did I ask you yesterday" -> rag
-    - "https://github.com/username" -> rag
-    - "what is a B-tree index" -> rag
+If the user explicitly asks for information from:
+- connected knowledge base
+- indexed documents
+- saved memories
+- repositories
+- project files
 
-    CONFIDENCE:
-    Return a number between 0.0 and 1.0 representing how confident
-    you are in the selected route.
+classify as RAG.
 
-    Metadata:
+3. ENTITY
+
+If the user asks about a specific person, project,
+repository, document, subject, or entity that exists
+in the connected knowledge base, classify as RAG.
+
+4. ASSISTANT
+
+"you", "your", or "yourself" refers to the AI assistant.
+
+"me", "my", or "myself" refers to the user.
+
+Questions about the AI assistant itself are PRODUCT.
+
+Examples:
+
+"How do you work?" -> PRODUCT
+"What model are you running?" -> PRODUCT
+"What are your capabilities?" -> PRODUCT
+"Explain your architecture" -> PRODUCT
+
+5. PRODUCT
+
+General questions about the assistant or its capabilities
+that do not request information from the connected
+knowledge base are PRODUCT.
+
+Metadata:
+
 {metadata}
 
-    """
+Repository metadata:
+
+{repo_metadata}
+"""
 
     system_message = SystemMessage(
         content=[
@@ -107,25 +229,30 @@ def graph_router_node(state):
     decision = structured_llm.invoke(
         [
             system_message,
-            ("human", state["query"]),
+            ("human", query),
         ]
     )
 
     latency = (Time.time() - start) * 1000
 
-    print("ROUTE:", decision.route)
+    print("LLM ROUTE:", decision.route)
     print("CONFIDENCE:", decision.confidence)
-    print("EXPLANATION:", decision.explanation)  # <-- now you can see WHY
+    print("EXPLANATION:", decision.explanation)
 
     state["trace"].append(
         {
             "node": "router",
             "latency_ms": latency,
             "confidence": decision.confidence,
-            "explanation": decision.explanation,  # <-- log it for debugging
-            "input": state["query"],
+            "explanation": decision.explanation,
+            "input": query,
             "output": decision.route,
+            "routing_type": "llm",
         }
     )
 
-    return {"route": decision.route, "confidence": decision.confidence, **state}
+    return {
+        **state,
+        "route": decision.route,
+        "confidence": decision.confidence,
+    }

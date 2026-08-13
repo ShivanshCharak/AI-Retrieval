@@ -14,6 +14,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from app.api.v1.ingestion import ingest
+from app.guardrails.output_validation import validate_output
 from app.db.database import get_db
 from app.graph.graph import graph
 from app.graph.nodes.memory import save_memory
@@ -246,10 +247,6 @@ async def query(
 
             return
 
-        # =============================================
-        # RAG ROUTE
-        # =============================================
-
         elif route == "rag":
 
             print("RAG ROUTE")
@@ -269,61 +266,92 @@ async def query(
             )
 
             prompt = f"""
-You are an answer generator.
+        You are an answer generator.
 
-Answer the user's question using ONLY the provided context.
+        Answer the user's question using ONLY the provided context.
 
-The words "I", "me", and "my" always refer to the USER, not you.
+        The words "I", "me", and "my" always refer to the USER, not you.
 
-Use all relevant information present in the context.
+        Use all relevant information present in the context.
 
-If the context contains only part of the requested information,
-answer using the information that IS present.
+        If the context contains only part of the requested information,
+        answer using the information that IS present.
 
-Do not refuse simply because some information is missing.
+        Do not refuse simply because some information is missing.
 
-Only say "I don't know" when the requested information is
-completely absent from the context.
+        Only say "I don't know" when the requested information is
+        completely absent from the context.
 
-Never invent or infer details that are not explicitly supported
-by the context.
+        Never invent or infer details that are not explicitly supported
+        by the context.
 
-If the context says "User", change it to "you" when appropriate.
+        If the context says "User", change it to "you" when appropriate.
 
-If the user asks "who am I?" and the context does not provide
-enough information, say you don't have enough information.
+        If the user asks "who am I?" and the context does not provide
+        enough information, say you don't have enough information.
 
-Question:
-{message}
+        Question:
+        {message}
 
-Context:
-{context}
-"""
+        Context:
+        {context}
+        """
 
             # =========================================
-            # STREAM RAG TOKENS
+            # GENERATE COMPLETE ANSWER
             # =========================================
 
-            full_answer = ""
+            print("GENERATING ANSWER...")
 
-            async for chunk in llm.astream(prompt):
+            response = await llm.ainvoke(prompt)
 
-                if not chunk.content:
-                    continue
+            full_answer = response.content
 
-                token = chunk.content
+            print("GENERATED ANSWER:")
+            print(full_answer)
 
-                full_answer += token
+            # =========================================
+            # OUTPUT GUARD
+            # =========================================
+
+            print("RUNNING OUTPUT GUARD...")
+
+            guard_result = validate_output(full_answer)
+
+            if not guard_result["is_safe"]:
+
+                print("🚫 OUTPUT BLOCKED")
+                print("REASON:", guard_result["raw"])
+
+                yield (f"data: {json.dumps({
+                        'type': 'guardrail',
+                        'blocked': True,
+                        'message': 'Response blocked by guardrail',
+                    })}\n\n")
+
+                return
+
+            print("✅ OUTPUT SAFE")
+
+            # =========================================
+            # STREAM SAFE ANSWER
+            # =========================================
+
+            # At this point the complete answer has already
+            # passed the output guard.
+
+            # We can now send it to the client in chunks.
+
+            chunk_size = 20
+
+            for i in range(0, len(full_answer), chunk_size):
+
+                token = full_answer[i : i + chunk_size]
 
                 yield (f"data: {json.dumps({
                         'type': 'token',
                         'content': token,
                     })}\n\n")
-
-                yield (f"data: {json.dumps({
-                                    'type': 'complete',
-                                    'trace': final_state.get("trace", []),
-                                }, default=str)}\n\n")
 
             # =========================================
             # SAVE MEMORY
@@ -362,7 +390,10 @@ Context:
                     'confidence': confidence,
                     'latency_ms': latency_ms,
                     'trace': trace,
-                },default=str)}\n\n")
+                    'output_guard': {
+                        'is_safe': True,
+                    },
+                }, default=str)}\n\n")
 
             return
 

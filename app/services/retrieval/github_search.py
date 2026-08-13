@@ -1,14 +1,17 @@
 import re
-import ast
+
 import os
+import json
+import hashlib
 
 from pathlib import Path
 from app.services.ingestion.github_loader import clone_repo
 from app.services.ingestion.ast_parser import parse_python_file
-from app.db.qdrant_client_embedder import embedder
-from app.services.ingestion.chunker import split_documents
+from app.services.ingestion.metadata_extraction import generate_collection_metadata
+from app.services.ingestion.ingestion_helper.chunker import split_documents
 from app.services.retrieval_service import retrieve_context
 from app.services.retrieval.vector_search import vector_store
+from app.services.ingestion.metadata_extraction import build_repo_scope_metadata
 from app.graph.state import GraphState
 from app.services.ingestion.symbol_extractor import (
     extract_calls,
@@ -44,7 +47,6 @@ def repo_already_indexed(user_id: str, repo_url: str) -> bool:
     )
 
     points, _ = result
-    print(points)
 
     return len(points) > 0
 
@@ -76,9 +78,7 @@ def github_embedder(url: str, userId: str):
 
             source = parsed["source"]
             tree = parsed["tree"]
-            # print("tree", ast.dump(tree, indent=2))
 
-            print("file", file)
             symbols = extract_symbols(tree, source)
             # # print("symbols", symbols)
             structure = {
@@ -131,40 +131,68 @@ def github_embedder(url: str, userId: str):
                         },
                     )
                 )
+    scope_metadata = build_repo_scope_metadata(repo)
+    save_repo_scope_metadata(userId, url, scope_metadata)
 
     chunks = split_documents(documents)
+
     for chunk in chunks:
         chunk.metadata["user_id"] = userId
+
     vector_store.add_documents(chunks)
     return repo
 
 
-def github_retrieval(state: GraphState, query: str, userId: str):
-    documents = retrieve_context("what about latency evaluation")
-    return documents
-
-
-def github_parser(state: GraphState, userId):
+def github_parser(state: GraphState):
     text = state["query"]
+
     match = re.search(r"https?://github\.com/\S+", text)
 
-    if not match:
-        return None, text.strip()
+    url = None
+    query = text
 
-    url = match.group(0)
-    query = (text[: match.start()] + text[match.end() :]).strip()
-    github_embedder(url, userId)
+    if match:
+        url = match.group(0).rstrip(".,)")
+        query = (text[: match.start()] + text[match.end() :]).strip()
+
+        print("query:", query)
+        print("repo_url:", url)
+
+        github_embedder(url, state["userId"])
+
     documents = retrieve_context(
         query=query,
-        user_id=userId,
+        user_id=state["userId"],
         repo_url=url,
     )
-    print("documents", documents)
+
     return documents
 
 
-if __name__ == "__main__":
-    github_parser(
-        "https://github.com/ShivanshCharak/AI-Retrieval what ai technology is used here",
-        4,
-    )
+SCOPE_CACHE_DIR = "scope_cache"
+
+
+def _scope_key(userId: str) -> str:
+    return hashlib.sha256(f"{userId}".encode()).hexdigest()
+
+
+def save_repo_scope_metadata(userId: str, url: str, scope_metadata: dict):
+    os.makedirs(SCOPE_CACHE_DIR, exist_ok=True)
+    path = os.path.join(SCOPE_CACHE_DIR, f"{_scope_key(userId)}.json")
+    with open(path, "w") as f:
+        json.dump(scope_metadata, f)
+
+
+def load_repo_scope_metadata(userId: str, url: str) -> dict | None:
+    path = os.path.join(SCOPE_CACHE_DIR, f"{_scope_key(userId)}.json")
+    if os.path.exists(path):
+        with open(path) as f:
+            return json.load(f)
+    return None
+
+
+# if __name__ == "__main__":
+#     github_parser(
+#         "https://github.com/ShivanshCharak/AI-Retrieval what ai technology is used here",
+#         4,
+#     )

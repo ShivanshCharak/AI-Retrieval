@@ -1,0 +1,101 @@
+id,query,relevant_chunk_id,relevant_page,page_label,topic_hint,source
+1,What does the book explain about compression?,01b72393-8803-4ca3-b17d-57a21bb63d69,30,31,compression,uploads/database-internals-9781492040347.pdf
+2,How does data files work in the context described here?,d1315fd4-f58c-45d4-8b3f-f455da455f27,33,34,data files,uploads/database-internals-9781492040347.pdf
+3,Why is secondary index important in this part of the system?,42ce0fbf-0f3e-4874-a24c-9c2cac97a87e,36,37,secondary index,uploads/database-internals-9781492040347.pdf
+4,What problem is B-Tree intended to solve?,327f4b96-d4e2-440f-b7d8-ffdbcdcd8f75,40,41,B-Tree,uploads/database-internals-9781492040347.pdf
+5,How does the database use balanced operation?,3b13d79c-a8d0-4eaa-81ba-40687a1bb80e,43,44,balanced operation,uploads/database-internals-9781492040347.pdf
+6,What role does flash translation layer play in this design?,79b50c38-ca0e-4510-9642-56bdff4d2974,46,47,flash translation layer,uploads/database-internals-9781492040347.pdf
+7,What are the main trade-offs of B-Tree?,5b4e6d99-b15a-42e9-bd91-604754c8c659,49,50,B-Tree,uploads/database-internals-9781492040347.pdf
+8,How is B-Tree implemented or handled according to the book?,2835dc47-74d2-407a-a530-a77ccddce690,53,54,B-Tree,uploads/database-internals-9781492040347.pdf
+9,What should I understand about OCC from this chapter?,37afe022-48d0-4696-a39d-f03b05ce907b,56,57,OCC,uploads/database-internals-9781492040347.pdf
+10,How does B-Tree affect correctness or performance?,fe8fd6be-01fa-40af-ac90-e22853bb65c2,59,60,B-Tree,uploads/database-internals-9781492040347.pdf
+11,What does the book explain about garbage collection?,6c276d88-2b28-40e6-873f-fc58ebd18524,62,63,garbage collection,uploads/database-internals-9781492040347.pdf
+12,How does ARIES work in the context described here?,e114d66d-aa09-44fd-86a5-9a30bb7a5134,65,66,ARIES,uploads/database-internals-9781492040347.pdf
+13,"In practical terms, what does the book say OCC is doing here?",b9cd7fe6-cb84-4cd3-99f8-442f89947fc5,69,70,OCC,uploads/database-internals-9781492040347.pdf
+14,What problem is page cache intended to solve?,eee97281-70ac-42cb-9afc-d99d0486a53e,72,73,page cache,uploads/database-internals-9781492040347.pdf
+15,How does the database use OCC?,7755cd16-4326-4112-ab71-a71098ab6e22,75,76,OCC,uploads/database-internals-9781492040347.pdf
+16,What role does slotted pages play in this design?,07ea8350-46c7-4795-9a3d-ab8e0768fb94,78,79,slotted pages,uploads/database-internals-9781492040347.pdf
+17,Can you explain why B-Trees matters in this section?,e75d7451-ecdf-4923-8f7d-0a778adaf5a5,83,84,B-Trees,uploads/database-internals-9781492040347.pdf
+18,How is binary search implemented or handled according to the book?,dc7dba5a-8350-472e-9ac2-914a9861edbe,86,87,binary search,uploads/database-internals-9781492040347.pdf
+19,How would you describe the purpose of OCC based on this passage?,ee8ca3c9-9b3b-4076-be6f-0fb92de147b4,89,90,OCC,uploads/database-internals-9781492040347.pdf
+20,How does compression affect correctness or performance?,fddebfe9-3a17-416c-b33b-cabdb5e4d8ee,92,93,compression,uploads/database-internals-9781492040347.pdf
+21,What does the book explain about Multiversion Concurrency Control?,cf3290df-6d58-435e-a10e-721ad2f45ec5,95,96,Multiversion Concurrency Control,uploads/database-internals-9781492040347.pdf
+22,How does lock manager work in the context described here?,a0ab3bc0-1c7a-42f7-880d-81dcd039001e,100,101,lock manager,uploads/database-internals-9781492040347.pdf
+23,Why is page cache important in this part of the system?,6ec10fa9-adcd-4ac8-a2bb-e393c36792ce,103,104,page cache,uploads/database-internals-9781492040347.pdf
+24,What problem is page cache intended to solve?,92186604-3f25-4b33-bcb0-15ef99bde972,106,107,page cache,uploads/database-internals-9781492040347.pdf
+25,How does the database use improve situation?,f854c55c-ae57-4a20-903d-9fbb411abc6a,109,110,improve situation,uploads/database-internals-9781492040347.pdf
+26,"In practical terms, what does the book say checkpoint is doing here?",a33fd346-9264-4556-850e-7edc10b3e035,113,114,checkpoint,uploads/database-internals-9781492040347.pdf
+27,What are the main trade-offs of concurrency control?,5df77c6b-0e15-4324-98ee-6e8dab834910,116,117,concurrency control,uploads/database-internals-9781492040347.pdf
+28,How is OCC implemented or handled according to the book?,dd5c6ff1-9d53-4cc4-a77a-f902bb2e3d23,119,120,OCC,uploads/database-internals-9781492040347.pdf
+29,What should I understand about concurrency control from this chapter?,bbafc048-5004-470b-a45b-b9bf217a8990,122,123,concurrency control,uploads/database-internals-9781492040347.pdf
+30,How does deadlocks affect correctness or performance?,03f4e892-3ead-4156-919f-f074e23cf4ac,125,126,deadlocks,uploads/database-internals-9781492040347.pdf
+31,What does the book explain about latches?,cbb9a8c5-ee84-428a-8d1d-ba7f759c380f,129,130,latches,uploads/database-internals-9781492040347.pdf
+32,How does transaction processing work in the context described here?,4ec6ad95-f9f9-4f02-a1cf-0ea405597c93,133,134,transaction processing,uploads/database-internals-9781492040347.pdf
+33,Why is write-ahead log important in this part of the system?,f2e92af9-fd6c-4288-b8c1-96e8318462da,138,139,write-ahead log,uploads/database-internals-9781492040347.pdf
+34,Can you explain why WiredTiger matters in this section?,872f0427-48bb-4568-8590-31f8cc188f9b,141,142,WiredTiger,uploads/database-internals-9781492040347.pdf
+35,How does the database use space amplification?,e0c6f75e-9594-4a18-9e59-dfbba9f5034b,146,147,space amplification,uploads/database-internals-9781492040347.pdf
+36,What role does garbage collection play in this design?,f8ad8c70-6d0d-455f-aacf-ab0b97547a53,149,150,garbage collection,uploads/database-internals-9781492040347.pdf
+37,What are the main trade-offs of B-Tree?,900c3b40-9bd4-4245-93f6-1583fb99a1ac,152,153,B-Tree,uploads/database-internals-9781492040347.pdf
+38,How would you describe the purpose of B-Tree based on this passage?,857efa2c-104f-4dac-8f60-398c30ef25ef,157,158,B-Tree,uploads/database-internals-9781492040347.pdf
+39,"In practical terms, what does the book say LSM Trees is doing here?",54b4f3db-55e9-48f3-b6fd-9aa60d91c02f,160,161,LSM Trees,uploads/database-internals-9781492040347.pdf
+40,How does write-ahead log affect correctness or performance?,ca6710df-add9-4e7c-9790-8c98ffbdf139,164,165,write-ahead log,uploads/database-internals-9781492040347.pdf
+41,What does the book explain about iterators exhausted?,ff0d2cfa-6d8d-4909-b380-068fabfd8259,167,168,iterators exhausted,uploads/database-internals-9781492040347.pdf
+42,How does compaction work in the context described here?,ab665969-e632-4102-9c5e-6a0bd30617c2,170,171,compaction,uploads/database-internals-9781492040347.pdf
+43,Why is write amplification important in this part of the system?,188627f0-1d90-4696-9d64-f6dd4d1d8be6,173,174,write amplification,uploads/database-internals-9781492040347.pdf
+44,What problem is cardinality estimation intended to solve?,bba7d679-8c70-4764-88a0-bfb73c3ef29d,177,178,cardinality estimation,uploads/database-internals-9781492040347.pdf
+45,How does the database use linearizability?,3b78c20f-1340-4859-bb79-c16b095b06e2,180,181,linearizability,uploads/database-internals-9781492040347.pdf
+46,What role does log-structured storage play in this design?,9409aa74-e7ba-4915-a465-ed2b334d80a8,183,184,log-structured storage,uploads/database-internals-9781492040347.pdf
+47,What are the main trade-offs of compaction?,be070167-d3aa-4737-a547-3afccca986e4,186,187,compaction,uploads/database-internals-9781492040347.pdf
+48,How is garbage collection implemented or handled according to the book?,1d68784b-8ed9-4caf-9b5e-31ec8073d6c4,189,190,garbage collection,uploads/database-internals-9781492040347.pdf
+49,What should I understand about garbage collection from this chapter?,a379fa24-9f8d-4336-894d-bfc2784af178,193,194,garbage collection,uploads/database-internals-9781492040347.pdf
+50,How does storage engine affect correctness or performance?,c350c5df-a481-4f5d-9297-a2cd0152f115,198,199,storage engine,uploads/database-internals-9781492040347.pdf
+51,Can you explain why algorithms define matters in this section?,2965004c-84d5-49fe-8b45-adbb75a73f0e,201,202,algorithms define,uploads/database-internals-9781492040347.pdf
+52,"In practical terms, what does the book say shared memory is doing here?",18e2846f-bd47-442a-a355-1e3bbbbf5df0,204,205,shared memory,uploads/database-internals-9781492040347.pdf
+53,Why is general process important in this part of the system?,78ebfbee-b4ee-4933-992a-2b8381222e6c,208,209,general process,uploads/database-internals-9781492040347.pdf
+54,What problem is network partitions intended to solve?,4d7006dc-47b6-475d-ae13-12feede83793,211,212,network partitions,uploads/database-internals-9781492040347.pdf
+55,How does the database use execution plan?,20023459-7523-43cc-9091-c78465e2cad8,214,215,execution plan,uploads/database-internals-9781492040347.pdf
+56,What role does network partitions play in this design?,fddfaecb-9e3f-4245-b1e8-39cffcad0320,217,218,network partitions,uploads/database-internals-9781492040347.pdf
+57,How would you describe the purpose of exactly once based on this passage?,a3650114-e854-4c06-afae-073dec469abf,220,221,exactly once,uploads/database-internals-9781492040347.pdf
+58,How is FLP impossibility implemented or handled according to the book?,7d83e895-5c69-45d3-98a4-8f8804f30451,224,225,FLP impossibility,uploads/database-internals-9781492040347.pdf
+59,What should I understand about network partitions from this chapter?,85b04bcc-beae-4d28-b33c-4ef309abac7a,227,228,network partitions,uploads/database-internals-9781492040347.pdf
+60,How does failure detection affect correctness or performance?,4b8bd252-6996-41a5-978a-a9f62563191e,230,231,failure detection,uploads/database-internals-9781492040347.pdf
+61,What does the book explain about timeout free?,5f182d23-24f4-4966-b33d-95bda3d10055,233,234,timeout free,uploads/database-internals-9781492040347.pdf
+62,How does failure detection work in the context described here?,1eb7d5ce-f8b3-4f93-bca0-e04361626110,237,238,failure detection,uploads/database-internals-9781492040347.pdf
+63,Why is chapter leader important in this part of the system?,aaf03227-434a-4bfb-87d8-0fe184f7614c,240,241,chapter leader,uploads/database-internals-9781492040347.pdf
+64,What problem is network partitions intended to solve?,eb51c3bb-9ac2-49c0-94ad-e3235272d2ec,243,244,network partitions,uploads/database-internals-9781492040347.pdf
+65,"In practical terms, what does the book say leader first is doing here?",69b8b439-b4fe-4f96-b09c-c4726fefefb1,246,247,leader first,uploads/database-internals-9781492040347.pdf
+66,What role does Raft play in this design?,e5bf1f29-6c74-4e93-8436-c6cff6677217,249,250,Raft,uploads/database-internals-9781492040347.pdf
+67,What are the main trade-offs of CAP?,5de0baf6-13fa-4520-8837-7b7b06eb682f,253,254,CAP,uploads/database-internals-9781492040347.pdf
+68,Can you explain why linearizability matters in this section?,6bacd8b2-cdc2-4618-b31e-f5a74b8c0d5a,256,257,linearizability,uploads/database-internals-9781492040347.pdf
+69,What should I understand about consistency models from this chapter?,56613481-1399-43e8-82c5-2e7342991c80,259,260,consistency models,uploads/database-internals-9781492040347.pdf
+70,How does compare-and-swap affect correctness or performance?,93844427-badf-4264-b52d-380a3b30ec17,262,263,compare-and-swap,uploads/database-internals-9781492040347.pdf
+71,What does the book explain about linearizability?,e27ff1d8-84c4-4664-b7e8-4283b8d17529,266,267,linearizability,uploads/database-internals-9781492040347.pdf
+72,How does causal consistency work in the context described here?,9647487a-52d8-410f-aa8b-4341a4a4a98d,269,270,causal consistency,uploads/database-internals-9781492040347.pdf
+73,Why is session models important in this part of the system?,cacd23be-bc4b-40a8-ba7e-7ea081b68bb5,272,273,session models,uploads/database-internals-9781492040347.pdf
+74,What problem is quorums intended to solve?,ee380617-358f-4fe6-94ab-9cfcbbc7eebb,275,276,quorums,uploads/database-internals-9781492040347.pdf
+75,How does the database use CRDTs?,3df886f6-9a96-44fb-93e8-91532db5eb21,279,280,CRDTs,uploads/database-internals-9781492040347.pdf
+76,How would you describe the purpose of figure broadcast based on this passage?,8767afad-cd38-4dff-bfd2-09b9a929b7f7,284,285,figure broadcast,uploads/database-internals-9781492040347.pdf
+77,What are the main trade-offs of since read?,99d34bc7-543f-4032-8cb8-6c89be48c18d,288,289,since read,uploads/database-internals-9781492040347.pdf
+78,"In practical terms, what does the book say demers processes is doing here?",d37e01a2-009b-42a6-9fb0-7693b8c41c9d,291,292,demers processes,uploads/database-internals-9781492040347.pdf
+79,What should I understand about recovery from this chapter?,4eca891b-7820-49d3-b5f4-ffc00615023e,294,295,recovery,uploads/database-internals-9781492040347.pdf
+80,How does information decandia affect correctness or performance?,6b7528e1-ef5d-481d-b8ef-4cebdf8c58c5,298,299,information decandia,uploads/database-internals-9781492040347.pdf
+81,What does the book explain about atomic commitment?,46b788dd-ae71-499c-b947-4e9e1e4224ff,301,302,atomic commitment,uploads/database-internals-9781492040347.pdf
+82,How does 2PC work in the context described here?,50548323-6ead-4c74-8b5e-5883f36fd116,304,305,2PC,uploads/database-internals-9781492040347.pdf
+83,Why is three-phase commit important in this part of the system?,65d4ba94-d168-472f-8379-dcd1c0713bb2,307,308,three-phase commit,uploads/database-internals-9781492040347.pdf
+84,What problem is Calvin intended to solve?,a704d816-7bb1-4bcf-9b97-b466979f63be,310,311,Calvin,uploads/database-internals-9781492040347.pdf
+85,Can you explain why two-phase commit matters in this section?,ed32597d-29b6-4174-96e7-61d530a0cffa,314,315,two-phase commit,uploads/database-internals-9781492040347.pdf
+86,What role does two-phase commit play in this design?,8f2df352-d375-4394-864c-6ee3bfc9652e,317,318,two-phase commit,uploads/database-internals-9781492040347.pdf
+87,What are the main trade-offs of Multiversion Concurrency Control?,09c655f0-8d84-4cb1-b509-206d23cd6a02,320,321,Multiversion Concurrency Control,uploads/database-internals-9781492040347.pdf
+88,How is FLP impossibility implemented or handled according to the book?,db3c763b-5305-4ec5-a80a-f5530dd099e1,324,325,FLP impossibility,uploads/database-internals-9781492040347.pdf
+89,What should I understand about virtual synchrony from this chapter?,870cb35e-121f-408a-a76d-c95f5616f1c8,328,329,virtual synchrony,uploads/database-internals-9781492040347.pdf
+90,How does Paxos affect correctness or performance?,c570219c-9af0-4631-9047-08f5f3f0b1fc,331,332,Paxos,uploads/database-internals-9781492040347.pdf
+91,"In practical terms, what does the book say Paxos is doing here?",1ab942c6-5590-4d5c-a36e-201fb38e8278,334,335,Paxos,uploads/database-internals-9781492040347.pdf
+92,How does Paxos work in the context described here?,16128a78-8034-4e1e-b495-d120b61a233c,337,338,Paxos,uploads/database-internals-9781492040347.pdf
+93,Why is Paxos important in this part of the system?,3897dd85-cac5-495a-87c2-9937ee674a6d,340,341,Paxos,uploads/database-internals-9781492040347.pdf
+94,What problem is Paxos intended to solve?,dd476c6c-701d-4ea7-9955-559c6475c03b,344,345,Paxos,uploads/database-internals-9781492040347.pdf
+95,How would you describe the purpose of quorums based on this passage?,e7234172-68b5-4eaf-90ab-1828d99cba3f,347,348,quorums,uploads/database-internals-9781492040347.pdf
+96,What role does Raft play in this design?,e33950e7-7da1-4950-9da0-dbd4dff160ea,350,351,Raft,uploads/database-internals-9781492040347.pdf
+97,What are the main trade-offs of Raft?,54e74ffb-aef7-44e9-82dc-4bf1f60f5797,353,354,Raft,uploads/database-internals-9781492040347.pdf
+98,How is nodes numbered implemented or handled according to the book?,89cfa325-0164-41ab-98f4-a7b38c1ee989,357,358,nodes numbered,uploads/database-internals-9781492040347.pdf
+99,What should I understand about Paxos from this chapter?,7dd0d352-df55-42ac-85dc-d0a965b78c03,360,361,Paxos,uploads/database-internals-9781492040347.pdf
+100,How does concurrency control affect correctness or performance?,2fe64598-f63b-4d2b-a2ec-163c3cb1340c,365,366,concurrency control,uploads/database-internals-9781492040347.pdf

@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import Sidebar from "@/components/sidebar/Sidebar";
 import MainArea from "@/components/main/MainArea";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function ChatPage() {
     const [sidebarVisibility, setSidebarVisibility]= useState<boolean>(true)
   const [activeChat, setActiveChat] = useState<string | null>("1");
   const {login} =useAuth()
+  const router = useRouter()
 
   const handleNewChat = () => setActiveChat(null);
 
@@ -17,8 +19,14 @@ export default function ChatPage() {
       credentials:"include"
     }).then(async (res)=>{
      try {
-       let data= await res.json()
-       login({name:data.username, email:data.email})
+      if (res.ok){
+      const data  = await res.json()
+        login({name:data.username, email:data.email})
+
+      }else if (res.status === 401){
+        login(null)
+        router.push("/login")
+      }
      } catch (error) {
       console.error(error)
      }
@@ -31,6 +39,7 @@ export default function ChatPage() {
   return (
     
       <div className="flex h-screen w-full font-sans">
+        
         <Sidebar
           activeChat={activeChat}
           onSelect={setActiveChat}

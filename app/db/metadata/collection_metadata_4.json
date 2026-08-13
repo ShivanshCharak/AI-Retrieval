@@ -1,15 +1,15 @@
 {
-  "summary": "The document outlines a technical assessment for a frontend developer at VectorShift, requiring implementation of JavaScript/React for the frontend and Python/FastAPI for the backend. The assessment includes four parts, with specific requirements for the Text node logic (dynamic sizing and variable insertion) and backend integration. The frontend must run using npm i and npm start, while the backend uses uvicorn main:app --reload. The document emphasizes collaboration between frontend and backend, with detailed instructions for code modifications and testing.",
+  "summary": "The document 'Database Internals' by Alex Petrov explores the foundational principles of distributed data systems, focusing on how these systems manage data integrity, consistency, and redundancy. The book provides an in-depth analysis of key concepts such as horizontal scaling, replication, fault tolerance, and query optimization. It emphasizes the importance of distributed databases in modern applications and their role in enabling scalable, reliable data management. The text is structured to explain complex topics through practical examples and technical insights, making it a valuable resource for professionals and students interested in database systems.",
   "topics": [
-    "Frontend Technical Assessment",
-    "JavaScript/React for Frontend",
-    "Python/FastAPI for Backend",
-    "Assessment Structure (4 Parts)",
-    "Text Node Logic (Dynamic Sizing & Variable Insertion)",
-    "Backend Integration Requirements",
-    "Folder Structure (frontend/src, backend)",
-    "Code Execution Instructions (npm i, npm start, uvicorn)",
-    "Text Node Example Usage",
-    "Integration Task Details"
+    "Distributed Data Systems and Their Role in Modern Applications",
+    "Data Consistency and Replication Strategies",
+    "Fault Tolerance and Recovery Mechanisms",
+    "Horizontal Scaling and Its Impact on Performance",
+    "Data Partitioning and Sharding Techniques",
+    "Indexing and Query Optimization in Distributed Databases",
+    "Security and Access Control in Distributed Systems",
+    "Transaction Management and ACID Properties",
+    "Performance Optimization in Distributed Environments",
+    "Case Studies and Real-World Applications of Distributed Databases"
   ]
 }

@@ -6,7 +6,7 @@ import time
 from app.db.qdrant_client_embedder import vector_store
 
 
-def vector_search(state: GraphState, query: str, userId: str, k: int = 5):
+def vector_search(state: GraphState, query: str, userId: str, k: int = 20):
     start = time.time()
 
     results = vector_store.similarity_search_with_score(
@@ -26,12 +26,14 @@ def vector_search(state: GraphState, query: str, userId: str, k: int = 5):
             "latency_ms": (time.time() - start) * 1000,
         }
     )
+
     for doc, score in results:
+        print(doc, score)
 
         docs.append(
             {
                 "content": doc.page_content,
-                "metadata": doc.metadata,
+                "metadata": doc.metadata or doc["metadata"],
                 "score": float(score),
                 "source": "qdrant",
             }

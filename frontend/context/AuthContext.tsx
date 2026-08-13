@@ -28,8 +28,7 @@ export function AuthProvider({
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter()
 
-  function login(user: User) {
-    console.log(user)
+  function login(user: User|null) {
     setUser(user);
   }
 

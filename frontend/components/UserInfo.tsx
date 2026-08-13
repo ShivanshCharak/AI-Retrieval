@@ -25,11 +25,11 @@ export default function AuthBlock({ sidebarVisibility }: TAuthBlock) {
   return (
     <>
       {isAuthenticated ? (
-        <div onClick={()=>handleClickAuth()} className="relative w-[90%] h-[70px] rounded-xl mb-[10px] flex  bg-gray-100 border-[1px] border-gray-200 hover:bg-gray-100 cursor-pointer">
-          <div className="w-[50px] h-[50px] ml-2 my-auto rounded-full bg-gray-300">
-            <span className="font-medium flex justify-center h-[50px] w-[50px] items-center text-gray-500">
+        <div onClick={()=>handleClickAuth()} className={`${sidebarVisibility ? "relative w-[90%] h-[70px] rounded-xl mb-[10px] flex  bg-gray-100 border-[1px] border-gray-200 hover:bg-gray-100 cursor-pointer":""}`}>
+          <div className={`ml-2 my-auto rounded-full text-xs flex items-center justify-center bg-gray-300 ${sidebarVisibility? "w-[50px] h-[50px]": "w-[30px] h-[30px]"}`}>
+            {/* <span className="font-medium flex justify-center h-[50px] w-[50px] items-center text-gray-500"> */}
               S H
-            </span>
+            {/* </span> */}
           </div>
           
           {sidebarVisibility && (

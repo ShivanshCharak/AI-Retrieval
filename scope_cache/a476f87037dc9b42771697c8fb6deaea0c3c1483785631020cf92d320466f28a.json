@@ -1,0 +1,147 @@
+{
+    "total_files": 59,
+    "total_symbols": 84,
+    "symbol_types": {
+        "class": 18,
+        "function": 54,
+        "async_function": 12
+    },
+    "total_calls": 389,
+    "call_graph_edges": 389,
+    "total_constants": 20,
+    "total_globals": 269,
+    "unique_imports": 87,
+    "external_deps": [
+        "ast",
+        "ast_parser",
+        "asyncio",
+        "collections",
+        "datasets",
+        "datetime",
+        "fastapi",
+        "fastapi.responses",
+        "git",
+        "json",
+        "jwt",
+        "langchain.agents",
+        "langchain_community.document_loaders",
+        "langchain_community.tools",
+        "langchain_core.documents",
+        "langchain_core.messages",
+        "langchain_core.prompts",
+        "langchain_nvidia_ai_endpoints",
+        "langchain_ollama",
+        "langchain_qdrant",
+        "langchain_text_splitters",
+        "langgraph.config",
+        "langgraph.graph",
+        "llm_guard",
+        "loader",
+        "neo4j",
+        "numpy",
+        "os",
+        "pandas",
+        "pathlib",
+        "pwdlib",
+        "pydantic",
+        "pydantic_settings",
+        "qdrant_client",
+        "qdrant_client.http.models",
+        "qdrant_client.models",
+        "ragas",
+        "ragas.llms",
+        "ragas.metrics",
+        "re",
+        "sqlalchemy",
+        "sqlalchemy.dialects.postgresql",
+        "sqlalchemy.orm",
+        "symbol_extractor",
+        "tempfile",
+        "time",
+        "traceback",
+        "typing"
+    ],
+    "internal_modules": [
+        "app.api.router",
+        "app.api.v1",
+        "app.api.v1.ingestion",
+        "app.db.database",
+        "app.db.metadata_store",
+        "app.db.models",
+        "app.db.neo4j_client",
+        "app.db.qdrant_client_embedder",
+        "app.evaluation.ragas.llm",
+        "app.graph.graph",
+        "app.graph.nodes.graph_router",
+        "app.graph.nodes.guardrail_node",
+        "app.graph.nodes.memory",
+        "app.graph.nodes.retrieval_node",
+        "app.graph.nodes_med",
+        "app.graph.state",
+        "app.guardrails.input_validation",
+        "app.guardrails.output_validation",
+        "app.services.fusion.rrf",
+        "app.services.ingestion.ast_parser",
+        "app.services.ingestion.chunker",
+        "app.services.ingestion.github_loader",
+        "app.services.ingestion.graph_builder",
+        "app.services.ingestion.ingestion_service",
+        "app.services.ingestion.metadata_extraction",
+        "app.services.ingestion.symbol_extractor",
+        "app.services.llm.llm_service",
+        "app.services.query_translation.hyde",
+        "app.services.query_translation.multi_query",
+        "app.services.query_translation.product_faq",
+        "app.services.query_translation.query_classifier",
+        "app.services.query_translation.router",
+        "app.services.query_translation.step_back_decomposition",
+        "app.services.query_translation.translation_service",
+        "app.services.reranking.rerank",
+        "app.services.retrieval.github_search",
+        "app.services.retrieval.memory_search",
+        "app.services.retrieval.vector_search",
+        "app.services.retrieval_service"
+    ],
+    "largest_files": [
+        [
+            "app/api/v1/auth.py",
+            5
+        ],
+        [
+            "app/services/ingestion/symbol_extractor.py",
+            5
+        ],
+        [
+            "app/services/retrieval/github_search.py",
+            4
+        ],
+        [
+            "app/db/models.py",
+            3
+        ],
+        [
+            "app/evaluation/evaluators/multi_query_eval.py",
+            3
+        ],
+        [
+            "app/evaluation/evaluators/product_faq_eval.py",
+            3
+        ],
+        [
+            "app/graph/nodes_med.py",
+            3
+        ],
+        [
+            "app/graph/graph.py",
+            3
+        ],
+        [
+            "app/db/metadata_store.py",
+            2
+        ],
+        [
+            "app/api/v1/ingestion.py",
+            2
+        ]
+    ]
+}
