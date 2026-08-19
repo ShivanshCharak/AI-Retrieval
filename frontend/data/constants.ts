@@ -35,6 +35,19 @@ export const CHAT_HISTORY: ChatGroup[] = [
   },
 ];
 
+export default async function History(){
+
+ try {
+   const data  = await fetch("http://localhost:8000/api/v1/conversations",{
+     credentials:'include',
+     method:"get",
+   })
+   let parsedData = await data.json()
+   console.log(parsedData)
+ } catch (error) {
+  console.error("SOmething went wrong")
+ }
+}
 export const NAV_LINKS: NavLink[] = [
   { label: "Explore", icon: Compass },
   { label: "Library", icon: BookOpen },

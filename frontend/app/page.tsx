@@ -1,18 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { act, useEffect, useState } from "react";
 import Sidebar from "@/components/sidebar/Sidebar";
 import MainArea from "@/components/main/MainArea";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
+
 export default function ChatPage() {
     const [sidebarVisibility, setSidebarVisibility]= useState<boolean>(true)
   const [activeChat, setActiveChat] = useState<string | null>("1");
-  const {login} =useAuth()
+  const [conversationId, setConversationId] =
+  useState<number | null>(null);
+  const {login,  user} =useAuth()
   const router = useRouter()
 
+
   const handleNewChat = () => setActiveChat(null);
+  useEffect(()=>{
+    setConversationId(Number(activeChat))
+  },[activeChat])
 
   useEffect(()=>{
      fetch("/api/auth/me",{
@@ -40,6 +47,7 @@ export default function ChatPage() {
     
       <div className="flex h-screen w-full font-sans">
         
+        
         <Sidebar
           activeChat={activeChat}
           onSelect={setActiveChat}
@@ -48,7 +56,12 @@ export default function ChatPage() {
           setSidebarVisibility={setSidebarVisibility}
           
         />
-        <MainArea userName="Toby" sidebarVisibility={sidebarVisibility}  />
+        <MainArea
+          userName={user?.name}
+          sidebarVisibility={sidebarVisibility}
+          conversationId={conversationId}
+          setConversationId={setConversationId}
+        />
       </div>
     
   );

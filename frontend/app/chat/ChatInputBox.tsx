@@ -23,7 +23,9 @@ interface ChatInputBoxProps {
   webSearch?: boolean;
   setStatus: React.Dispatch<SetStateAction<{stage:string,title:string, description:string}[]>>
   setTraceNode: React.Dispatch<SetStateAction<TraceNode[]>>
+  message:{role:"user"|"assistant";content: string, loading:boolean, file?:{name:string, type:string}}[]
   status: string
+
   
 }
 
@@ -34,6 +36,7 @@ export default function ChatInputBox({
   setMessage,
   setChatting,
   setTraceNode,
+  message,
   setStatus,
 }: ChatInputBoxProps) {
   const [input, setInput] = useState("");
@@ -42,6 +45,12 @@ export default function ChatInputBox({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [webSearch, setWebSearch] = useState<boolean>(false);
     const [deepSearch, setDeepSearch] = useState<boolean>(false);
+
+    useEffect(()=>{
+      if (message.length > 0){
+        setChatting(true)
+      }
+    },[message])
 
   const handleSend = async () => {
     const formdata = new FormData();
@@ -232,7 +241,7 @@ while (true) {
 
   return (
     <div
-      className={` w-[70%] bg-white rounded-2xl  shadow-sm border border-gray-200 overflow-hidden ${chatting ? "bottom-0 fixed" : ""}`}
+      className={` bg-white rounded-2xl  shadow-sm border border-gray-200 overflow-hidden ${chatting ? "bottom-0 fixed w-[80%]" : ""}`}
     >
       
       {/* Upgrade banner */}

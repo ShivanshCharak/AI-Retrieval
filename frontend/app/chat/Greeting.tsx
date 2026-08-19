@@ -4,7 +4,7 @@ interface GreetingProps {
 
 export default function Greeting({ name }: GreetingProps) {
   return (
-    <div className="text-center">
+    <div className="text-center ml-[20px]">
       <h1 className="text-3xl font-bold text-gray-900 mb-1">Good Morning, {name}</h1>
       <p className="text-3xl font-bold text-gray-900">
         How Can I{" "}

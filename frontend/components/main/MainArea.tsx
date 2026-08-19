@@ -3,153 +3,158 @@ import OrbIcon from "../../app/chat/OrbIcon";
 import Greeting from "../../app/chat/Greeting";
 import ChatInputBox from "../../app/chat/ChatInputBox";
 import QuickActions from "../../app/chat/QuickActions";
-import ReactMarkdown from "react-markdown";
-import { Paperclip } from "lucide-react";
-import remarkGfm from "remark-gfm";
-import { Copy, ThumbsDown, ThumbsUp, CloudLightning } from "lucide-react";
 
-import { useState } from "react";
-import { LoaderIcon } from "lucide-react";
-import { Check } from "lucide-react";
-import ResponseTime from "../tracenode";
+
+import { useConversationStorage } from "./hooks/useConversationStorage";
+import { useConversation } from "./hooks/useConversation";
+import { useConversationSync } from "./hooks/useConersationSync";
+
+import MessageList from "./components/MessageList";
+
+import { useState, useEffect } from "react";
 
 interface MainAreaProps {
   userName?: string;
   sidebarVisibility: boolean;
+  conversationId?: number | null;
+  setConversationId: React.Dispatch<
+    React.SetStateAction<number | null>
+  >;
 }
+
 type TraceNode = {
   node: string;
   latency_ms: number;
 };
 
-export default function MainArea({
-  userName = "Toby",
-  sidebarVisibility,
-}: MainAreaProps) {
-  const [status, setStatus] = useState<
-    { stage: string; title: string; description: string }[]
-  >([]);
-  const [showCheck, setShowCheck] = useState<number | null>();
-  const [traceNode, setTraceNode] = useState<TraceNode[]>();
-  const [message, setMessage] = useState<
-    {
-      role: "user" | "assistant";
-      content: string;
-      loading: boolean;
-      file?: { name: string; type: string };
-    }[]
-  >([]);
-  const [isChatting, setIsChatting] = useState<boolean>(false);
-  const handleSend = (content: string, model: string, file?: File) => {
-    setMessage((prev) => [
-      ...prev,
-      {
-        role: "user",
-        content,
-        loading: false,
-        file: file
-          ? {
-              name: file.name,
-              type: file.type,
-            }
-          : undefined,
-      },
-      {
-        role: "assistant",
-        content: "",
-        loading: true,
-      },
-    ]);
+type ChatMessage = {
+  role: "user" | "assistant";
+  content: string;
+  loading: boolean;
+  file?: {
+    name: string;
+    type: string;
   };
-  return (
-    <main
-      className={`flex-1 flex flex-col items-center justify-center gap-8 bg-gray-50 px-6 ${sidebarVisibility ? "w-[83%]" : "w-[97%]"} overflow-y-scroll`}
-    >
-      <div className="flex flex-col items-center gap-5">
-        {message.length == 0 ? (
-          <>
-            <OrbIcon />
-            <Greeting name={userName} />
-          </>
-        ) : (
-          <></>
-        )}
-      </div>
-      <div className="w-full top-20 absolute max-w-2xl flex flex-col gap-2 overflow-y-auto ">
-        {message.map((msg, i) => (
-          <div
-            key={i}
-            className={`w-full flex flex-col ${
-              msg.role === "user" ? "items-end" : "items-start"
-            }`}
-          >
-            {/* Message bubble */}
-            <div
-              className={`px-3 py-2 rounded-lg text-sm w-fit max-w-[80%] ${
-                msg.role === "user"
-                  ? "bg-black text-white"
-                  : "bg-gray-200 text-black"
-              }`}
-            >
-              {msg.loading ? (
-                <LoaderIcon className="animate-spin" size={16} />
-              ) : (
-                <>
-                  {msg.role === "user" && msg.file && (
-                    <div className="mb-2 flex items-center gap-2 rounded-lg border border-gray-500 bg-gray-800 px-3 py-2 w-fit">
-                      <Paperclip size={14} />
-                      <span>{msg.file.name}</span>
-                    </div>
-                  )}
+};
 
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {msg.content}
-                  </ReactMarkdown>
-                </>
-              )}
-            </div>
-            {msg.role === "assistant" && !msg.loading && (
-              <div className="flex items-center gap-2 mt-2 items-start">
-                {[Copy, ThumbsDown, ThumbsUp, CloudLightning].map(
-                  (Icon, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        setShowCheck(index);
+export default function MainArea({
+  userName,
+  sidebarVisibility,
+  conversationId = null,
+  setConversationId,
+}: MainAreaProps) {
+  const [message, setMessage] = useState<ChatMessage[]>([]);
+  const [isChatting, setIsChatting] = useState(false);
+  const [status, setStatus] = useState([]);
+  const [traceNode, setTraceNode] = useState<TraceNode[]>([]);
 
-                        setTimeout(() => {
-                          setShowCheck(null);
-                        }, 1500);
-                      }}
-                      className="bg-transparent hover:bg-gray-200 p-1 rounded-sm cursor-pointer"
-                    >
-                      {showCheck === index ? (
-                        <Check size={16} />
-                      ) : (
-                        <Icon size={16} />
-                      )}
-                    </button>
-                  ),
-                )}
+  useEffect(() => {
+  if (!conversationId) {
+    setMessage([]);
+    return;
+  }
 
-                {traceNode && <ResponseTime trace={traceNode} />}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+  const loadConversation = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/api/v1/conversation/${conversationId}`,
+        {
+          credentials: "include",
+        }
+      );
 
+      if (!response.ok) {
+        throw new Error("Failed to fetch conversation");
+      }
+
+      const data = await response.json();
+
+      console.log("Loaded conversation:", data);
+
+      setMessage(data.result.messages ?? []);
+
+    } catch (error) {
+      console.error("Failed to load conversation:", error);
+    }
+  };
+
+  loadConversation();
+}, [conversationId]);
+
+  const storageKey = conversationId
+    ? `conversation_${conversationId}`
+    : "conversation_new";
+
+  useConversationStorage(
+    storageKey,
+    message,
+    setMessage
+  );
+
+  useConversationSync(
+    conversationId,
+    message
+  );
+
+  // Conversation API
+  const { sendMessage } = useConversation({
+    conversationId,
+    setConversationId,
+    setMessages: setMessage,
+  });
+
+  
+return (
+  <main
+    className={`flex-1 flex flex-col bg-gray-50 px-6 ${
+      sidebarVisibility ? "w-[83%]" : "w-[97%]"
+    } relative overflow-hidden`}
+  >
+   {message.length === 0 ? (
+  <div className="flex-1 w-full flex flex-col items-center justify-center">
+    <OrbIcon />
+    <Greeting name={userName ?? ""} />
+
+    <div className="w-full max-w-2xl mt-6">
       <ChatInputBox
-        onSend={handleSend}
+        onSend={sendMessage}
         setMessage={setMessage}
-        chatting={isChatting}
+        message={message}
+        chatting={false}
         setChatting={setIsChatting}
         setTraceNode={setTraceNode}
         status={status}
         setStatus={setStatus}
       />
+    </div>
 
-      {message.length > 0 ? "" : <QuickActions actions={QUICK_ACTIONS} />}
-    </main>
-  );
+    <QuickActions
+      actions={QUICK_ACTIONS}
+    />
+  </div>
+) : (
+  <>
+    <div className="w-full mt-[50px] overflow-y-auto flex justify-center">
+      <MessageList
+        messages={message}
+        traceNode={traceNode}
+      />
+    </div>
+
+    <div className="absolute bottom-4 w-full  flex justify-center">
+      <ChatInputBox
+        onSend={sendMessage}
+        setMessage={setMessage}
+        message={message}
+        chatting={true}
+        setChatting={setIsChatting}
+        setTraceNode={setTraceNode}
+        status={status}
+        setStatus={setStatus}
+      />
+    </div>
+  </>
+)}
+  </main>
+);
 }

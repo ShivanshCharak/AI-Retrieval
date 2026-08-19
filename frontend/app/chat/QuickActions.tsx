@@ -7,7 +7,7 @@ interface QuickActionsProps {
 
 export default function QuickActions({ actions, onAction }: QuickActionsProps) {
   return (
-    <div className="flex items-center gap-3 flex-wrap justify-center">
+    <div className="flex mt-10 items-center gap-3 flex-wrap justify-center">
       {actions.map(({ label, icon: Icon }) => (
         <button
           key={label}

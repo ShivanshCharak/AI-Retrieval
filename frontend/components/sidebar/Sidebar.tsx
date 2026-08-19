@@ -1,7 +1,7 @@
 "use client";
 
 import { LayoutDashboard } from "lucide-react";
-import { CHAT_HISTORY, NAV_LINKS } from "@/data/constants";
+import {  NAV_LINKS } from "@/data/constants";
 import SidebarSearch from "../../app/chat/SidebarSearch";
 import ChatHistory from "../../app/chat/ChatHistory";
 import SidebarNav from "../../app/chat/SidebarNav";
@@ -9,18 +9,33 @@ import NewChatButton from "../../app/chat/NewChatButton";
 import { PanelRight, Menu } from "lucide-react";
 import AuthBlock from "../UserInfo";
 import {SetStateAction, useEffect, useState} from 'react' 
-
+import useChatHistory from "./hooks/useChatHistory";
+import getChatHistory from "./hooks/useChatHistory";
 interface SidebarProps {
   activeChat: string | null;
   onSelect: (id: string) => void;
-  onNewChat?: () => void;
+
   sidebarVisibility: boolean,
   setSidebarVisibility: React.Dispatch<SetStateAction<boolean>>
 }
 
 
 
-export default function Sidebar({ activeChat, onSelect, onNewChat, sidebarVisibility, setSidebarVisibility }: SidebarProps) {
+export default function Sidebar({ activeChat, onSelect, sidebarVisibility, setSidebarVisibility }: SidebarProps) {
+
+ const [chatHistory, setChatHistory] = useState<ChatGroup[]>([]);
+
+useEffect(() => {
+  async function loadHistory() {
+    const data = await getChatHistory();
+
+    console.log(data);
+
+    setChatHistory(data);
+  }
+
+  loadHistory();
+}, []);
 
   useEffect(() => {
   const handleResize = () => {
@@ -47,10 +62,11 @@ export default function Sidebar({ activeChat, onSelect, onNewChat, sidebarVisibi
        setSidebarVisibility((prev)=> !prev)
       )} />
       </div>
-      <NewChatButton onClick={onNewChat} visibility={sidebarVisibility} />
+      <NewChatButton  setChatHistory = {setChatHistory} visibility={sidebarVisibility} />
+     
 
 
-      {sidebarVisibility && <ChatHistory groups={CHAT_HISTORY} activeId={activeChat} onSelect={onSelect} />}
+      {sidebarVisibility && <ChatHistory groups={chatHistory} activeId={activeChat} onSelect={onSelect} />}
       <div className="absolute bottom-4 w-full">
 
         <SidebarNav links={NAV_LINKS} visibility={sidebarVisibility} />
