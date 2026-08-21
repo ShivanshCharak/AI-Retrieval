@@ -189,8 +189,8 @@ async def add_message(
             detail="Conversation not found",
         )
 
-    # Create a new list so SQLAlchemy detects
-    # the JSONB modification reliably.
+    is_first_message = len(conversation.messages) == 0
+
     conversation.messages = [
         *conversation.messages,
         {
@@ -246,7 +246,7 @@ async def create_empty_conversation(
 ):
     conversation = Conversation(
         user_id=user_id,
-        title="New chat",
+        title=None,
         messages=[],
         files=[],
     )

@@ -12,7 +12,8 @@ from fastapi import (
 )
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
-
+from sqlalchemy import select
+from app.db.models import Conversation
 from app.api.v1.ingestion import ingest
 from app.guardrails.output_validation import validate_output
 from app.db.database import get_db
@@ -20,8 +21,15 @@ from app.graph.graph import graph
 from app.graph.nodes.memory import save_memory
 from app.graph.state import GraphState
 from app.services.llm.llm_service import llm
+from pydantic import BaseModel
 
 router = APIRouter()
+
+
+class AnswerWithTitle(BaseModel):
+    answer: str
+    topic: str
+
 
 SECRET_KEY = "4WfP4JbL6lLQ5zQZ_8K4YxW5RkM8bM7T9dN2L8xR1cA"
 
@@ -68,11 +76,13 @@ async def query(
     message: str = Form(...),
     model: str = Form(...),
     web_search: bool = Form(False),
+    conversation_id: int = Form(...),
     file: UploadFile | None = File(None),
     deep_search: bool = Form(False),
     db: Session = Depends(get_db),
 ):
     token = request.cookies.get("access_token")
+    print(conversation_id)
 
     if not token:
         raise HTTPException(
@@ -93,17 +103,16 @@ async def query(
 
     async def generate():
 
-        final_state = None
-
-        initial_state: GraphState = {
-            "query": message,
-            "userId": user_id,
-            "trace": [],
-            "deep_search": deep_search,
-            "web_search": web_search,
-        }
-
         try:
+            final_state = None
+
+            initial_state: GraphState = {
+                "query": message,
+                "userId": user_id,
+                "trace": [],
+                "deep_search": deep_search,
+                "web_search": web_search,
+            }
 
             async for mode, data in graph.astream(
                 initial_state,
@@ -176,237 +185,266 @@ async def query(
 
                     final_state = data
 
+            # =============================================
+            # NO FINAL STATE
+            # =============================================
+
+            if final_state is None:
+
+                yield (f"data: {json.dumps({
+                        'type': 'error',
+                        'message': 'Graph execution failed',
+                    })}\n\n")
+
+                return
+
+            print("FINAL STATE:", final_state)
+
+            # =============================================
+            # ROUTE
+            # =============================================
+
+            route = final_state.get("route")
+
+            if not route:
+
+                yield (f"data: {json.dumps({
+                        'type': 'error',
+                        'message': 'No route was produced by the graph.',
+                    })}\n\n")
+
+                return
+
+            # =============================================
+            # PRODUCT ROUTE
+            # =============================================
+
+            if route == "product":
+
+                print("PRODUCT ROUTE")
+
+                answer = final_state.get("answer", "")
+                topic = final_state.get("topic", "")
+
+                if answer:
+
+                    yield (f"data: {json.dumps({
+                            'type': 'token',
+                            "title": topic,
+                            'content': answer,
+                        })}\n\n")
+
+                yield (f"data: {json.dumps({
+                        'type': 'complete',
+                        "title": topic,
+                        'trace': final_state.get("trace", []),
+                    })}\n\n")
+
+                save_memory(
+                    userId=user_id,
+                    message=message,
+                    db=db,
+                )
+
+                return
+
+            elif route == "rag":
+
+                print("RAG ROUTE")
+
+                docs = final_state.get(
+                    "reranked_docs",
+                    [],
+                )
+
+                context = "\n\n".join(
+                    (
+                        doc.page_content
+                        if hasattr(doc, "page_content")
+                        else str(doc.get("content", ""))
+                    )
+                    for doc in docs
+                )
+
+                prompt = f"""
+            You are an answer generator.
+
+            Answer the user's question using ONLY the provided context.
+
+            The words "I", "me", and "my" always refer to the USER, not you.
+
+            Use all relevant information present in the context.
+
+            If the context contains only part of the requested information,
+            answer using the information that IS present.
+
+            Do not refuse simply because some information is missing.
+
+            Only say "I don't know" when the requested information is
+            completely absent from the context.
+
+            Never invent or infer details that are not explicitly supported
+            by the context.
+
+            If the context says "User", change it to "you" when appropriate.
+
+            If the user asks "who am I?" and the context does not provide
+            enough information, say you don't have enough information.
+            Generate a short conversation topic for the user's question.
+
+            The topic should:
+            - Be 3-7 words
+            - Clearly describe what the user is asking about
+            - Not be a sentence
+            - Not include quotes
+            - Not include punctuation at the end
+            Question:
+            {message}
+
+            Context:
+            {context}
+            """
+
+                # =========================================
+                # GENERATE COMPLETE ANSWER
+                # =========================================
+
+                print("GENERATING ANSWER...")
+                structured_llm = llm.with_structured_output(AnswerWithTitle)
+                response = await structured_llm.ainvoke(prompt)
+                conversation = db.scalar(
+                    select(Conversation).where(
+                        Conversation.id == conversation_id,
+                        Conversation.user_id == user_id,
+                    )
+                )
+
+                conversation.title = response.topic
+                db.commit()
+                if not conversation:
+                    yield f"data: {json.dumps({
+                        'type': 'error',
+                        'message': 'Conversation not found',
+                    })}\n\n"
+                    return
+                full_answer = response.answer
+                title = response.topic
+                title = response.topic
+
+                print("GENERATED ANSWER:")
+                print(full_answer)
+
+                print("GENERATED TITLE:")
+                print(title)
+
+                # =========================================
+                # OUTPUT GUARD
+                # =========================================
+
+                print("RUNNING OUTPUT GUARD...")
+
+                guard_result = validate_output(full_answer)
+
+                if not guard_result["is_safe"]:
+
+                    print("🚫 OUTPUT BLOCKED")
+                    print("REASON:", guard_result["raw"])
+
+                    yield (f"data: {json.dumps({
+                            'type': 'guardrail',
+                            'blocked': True,
+                            'message': 'Response blocked by guardrail',
+                        })}\n\n")
+
+                    return
+
+                print("✅ OUTPUT SAFE")
+
+                # =========================================
+                # STREAM SAFE ANSWER
+                # =========================================
+
+                # At this point the complete answer has already
+                # passed the output guard.
+
+                # We can now send it to the client in chunks.
+
+                chunk_size = 20
+
+                for i in range(0, len(full_answer), chunk_size):
+
+                    token = full_answer[i : i + chunk_size]
+
+                    yield (f"data: {json.dumps({
+                            'type': 'token',
+                            'content': token,
+                        })}\n\n")
+
+                # =========================================
+                # SAVE MEMORY
+                # =========================================
+
+                save_memory(
+                    userId=user_id,
+                    message=message,
+                    db=db,
+                )
+
+                # =========================================
+                # TRACE
+                # =========================================
+
+                trace = final_state.get(
+                    "trace",
+                    [],
+                )
+
+                confidence = None
+                latency_ms = None
+
+                if trace:
+
+                    confidence = trace[-1].get("confidence")
+
+                    latency_ms = trace[-1].get("latency_ms")
+
+                # =========================================
+                # COMPLETE
+                # =========================================
+
+                yield (f"data: {json.dumps({
+                        'type': 'complete',
+                        'confidence': confidence,
+                        'title': title,
+                        'latency_ms': latency_ms,
+                        'trace': trace,
+                        'output_guard': {
+                            'is_safe': True,
+                        },
+                    }, default=str)}\n\n")
+
+                return
+
+            # =============================================
+            # UNKNOWN ROUTE
+            # =============================================
+
+            else:
+
+                yield (f"data: {json.dumps({
+                        'type': 'error',
+                        'message': f'Unknown route: {route}',
+                    })}\n\n")
+
+                return
         except Exception as exc:
 
             print("GRAPH ERROR:", repr(exc))
 
             yield (f"data: {json.dumps({
-                    'type': 'error',
-                    'message': 'An error occurred while processing the request.',
-                })}\n\n")
-
-            return
-
-        # =============================================
-        # NO FINAL STATE
-        # =============================================
-
-        if final_state is None:
-
-            yield (f"data: {json.dumps({
-                    'type': 'error',
-                    'message': 'Graph execution failed',
-                })}\n\n")
-
-            return
-
-        print("FINAL STATE:", final_state)
-
-        # =============================================
-        # ROUTE
-        # =============================================
-
-        route = final_state.get("route")
-
-        if not route:
-
-            yield (f"data: {json.dumps({
-                    'type': 'error',
-                    'message': 'No route was produced by the graph.',
-                })}\n\n")
-
-            return
-
-        # =============================================
-        # PRODUCT ROUTE
-        # =============================================
-
-        if route == "product":
-
-            print("PRODUCT ROUTE")
-
-            answer = final_state.get("answer", "")
-
-            if answer:
-
-                yield (f"data: {json.dumps({
-                        'type': 'token',
-                        'content': answer,
-                    })}\n\n")
-
-            yield (f"data: {json.dumps({
-                    'type': 'complete',
-                    'trace': final_state.get("trace", []),
-                })}\n\n")
-
-            save_memory(
-                userId=user_id,
-                message=message,
-                db=db,
-            )
-
-            return
-
-        elif route == "rag":
-
-            print("RAG ROUTE")
-
-            docs = final_state.get(
-                "reranked_docs",
-                [],
-            )
-
-            context = "\n\n".join(
-                (
-                    doc.page_content
-                    if hasattr(doc, "page_content")
-                    else str(doc.get("content", ""))
-                )
-                for doc in docs
-            )
-
-            prompt = f"""
-        You are an answer generator.
-
-        Answer the user's question using ONLY the provided context.
-
-        The words "I", "me", and "my" always refer to the USER, not you.
-
-        Use all relevant information present in the context.
-
-        If the context contains only part of the requested information,
-        answer using the information that IS present.
-
-        Do not refuse simply because some information is missing.
-
-        Only say "I don't know" when the requested information is
-        completely absent from the context.
-
-        Never invent or infer details that are not explicitly supported
-        by the context.
-
-        If the context says "User", change it to "you" when appropriate.
-
-        If the user asks "who am I?" and the context does not provide
-        enough information, say you don't have enough information.
-
-        Question:
-        {message}
-
-        Context:
-        {context}
-        """
-
-            # =========================================
-            # GENERATE COMPLETE ANSWER
-            # =========================================
-
-            print("GENERATING ANSWER...")
-
-            response = await llm.ainvoke(prompt)
-
-            full_answer = response.content
-
-            print("GENERATED ANSWER:")
-            print(full_answer)
-
-            # =========================================
-            # OUTPUT GUARD
-            # =========================================
-
-            print("RUNNING OUTPUT GUARD...")
-
-            guard_result = validate_output(full_answer)
-
-            if not guard_result["is_safe"]:
-
-                print("🚫 OUTPUT BLOCKED")
-                print("REASON:", guard_result["raw"])
-
-                yield (f"data: {json.dumps({
-                        'type': 'guardrail',
-                        'blocked': True,
-                        'message': 'Response blocked by guardrail',
-                    })}\n\n")
-
-                return
-
-            print("✅ OUTPUT SAFE")
-
-            # =========================================
-            # STREAM SAFE ANSWER
-            # =========================================
-
-            # At this point the complete answer has already
-            # passed the output guard.
-
-            # We can now send it to the client in chunks.
-
-            chunk_size = 20
-
-            for i in range(0, len(full_answer), chunk_size):
-
-                token = full_answer[i : i + chunk_size]
-
-                yield (f"data: {json.dumps({
-                        'type': 'token',
-                        'content': token,
-                    })}\n\n")
-
-            # =========================================
-            # SAVE MEMORY
-            # =========================================
-
-            save_memory(
-                userId=user_id,
-                message=message,
-                db=db,
-            )
-
-            # =========================================
-            # TRACE
-            # =========================================
-
-            trace = final_state.get(
-                "trace",
-                [],
-            )
-
-            confidence = None
-            latency_ms = None
-
-            if trace:
-
-                confidence = trace[-1].get("confidence")
-
-                latency_ms = trace[-1].get("latency_ms")
-
-            # =========================================
-            # COMPLETE
-            # =========================================
-
-            yield (f"data: {json.dumps({
-                    'type': 'complete',
-                    'confidence': confidence,
-                    'latency_ms': latency_ms,
-                    'trace': trace,
-                    'output_guard': {
-                        'is_safe': True,
-                    },
-                }, default=str)}\n\n")
-
-            return
-
-        # =============================================
-        # UNKNOWN ROUTE
-        # =============================================
-
-        else:
-
-            yield (f"data: {json.dumps({
-                    'type': 'error',
-                    'message': f'Unknown route: {route}',
-                })}\n\n")
+                            'type': 'error',
+                            'message': 'An error occurred while processing the request.',
+                        })}\n\n")
 
             return
 

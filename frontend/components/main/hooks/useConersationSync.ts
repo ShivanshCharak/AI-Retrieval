@@ -15,6 +15,7 @@ export function useConversationSync(
   messages: ChatMessage[]
 ) {
   const messagesRef = useRef(messages);
+  const lastSyncedMessages = useRef("");
 
   useEffect(() => {
     messagesRef.current = messages;
@@ -35,6 +36,18 @@ export function useConversationSync(
         return;
       }
 
+      const payload = messagesToSave.map((msg) => ({
+        role: msg.role,
+        content: msg.content,
+      }));
+
+      const serialized = JSON.stringify(payload);
+
+      // Don't sync if nothing changed
+      if (serialized === lastSyncedMessages.current) {
+        return;
+      }
+
       try {
         await fetch(
           `http://localhost:8000/api/v1/conversation/${conversationId}/sync`,
@@ -45,13 +58,12 @@ export function useConversationSync(
             },
             credentials: "include",
             body: JSON.stringify({
-              messages: messagesToSave.map((msg) => ({
-                role: msg.role,
-                content: msg.content,
-              })),
+              messages: payload,
             }),
           }
         );
+
+        lastSyncedMessages.current = serialized;
 
         console.log("Conversation synced");
       } catch (error) {

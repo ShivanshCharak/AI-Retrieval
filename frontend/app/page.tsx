@@ -6,10 +6,14 @@ import MainArea from "@/components/main/MainArea";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
-
+type TraceNode = {
+  node: string;
+  latency_ms: number;
+};
 export default function ChatPage() {
     const [sidebarVisibility, setSidebarVisibility]= useState<boolean>(true)
   const [activeChat, setActiveChat] = useState<string | null>("1");
+  const [traceNode, setTraceNode] = useState<TraceNode[]>([]);
   const [conversationId, setConversationId] =
   useState<number | null>(null);
   const {login,  user} =useAuth()
@@ -43,15 +47,16 @@ export default function ChatPage() {
   },[])
 
 
+  console.log("tracenode on page.tsx",traceNode)
   return (
     
       <div className="flex h-screen w-full font-sans">
-        
         
         <Sidebar
           activeChat={activeChat}
           onSelect={setActiveChat}
           onNewChat={handleNewChat}
+          title ={traceNode.title}
           sidebarVisibility={sidebarVisibility}
           setSidebarVisibility={setSidebarVisibility}
           
@@ -59,6 +64,8 @@ export default function ChatPage() {
         <MainArea
           userName={user?.name}
           sidebarVisibility={sidebarVisibility}
+          setTraceNode={setTraceNode}
+          traceNode = {traceNode}
           conversationId={conversationId}
           setConversationId={setConversationId}
         />

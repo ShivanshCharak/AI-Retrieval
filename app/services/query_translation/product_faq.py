@@ -3,14 +3,20 @@ from app.services.llm.llm_service import llm
 import time as Time
 from langgraph.config import get_stream_writer
 from app.graph.state import GraphState
+from sqlalchemy.orm import Session
+from app.db.database import get_db
+from app.db.models import Conversation
+from fastapi import Depends
+from sqlalchemy import select
 
 
 class ProductfaqOutput(BaseModel):
     response: str
     confidence: float
+    topic: str
 
 
-def product_faq(state: GraphState):
+def product_faq(state: GraphState, db: Session = Depends(get_db)):
     start = Time.time()
     query = state["query"]
     writer = get_stream_writer()
@@ -26,6 +32,13 @@ def product_faq(state: GraphState):
          If the information below does not contain the requested answer, politely say that you don't have that information.
     
          Keep responses conversational, concise, and easy to understand.
+
+        The topic should:
+        - Be 3-7 words
+        - Clearly describe what the user is asking about
+        - Not be a sentence
+        - Not include quotes
+        - Not include punctuation at the end
     
         -----------------------
         PRODUCT INFORMATION
@@ -138,6 +151,7 @@ def product_faq(state: GraphState):
         {query}
     """
     response = llm.with_structured_output(ProductfaqOutput).invoke(prompt)
+    print("response", response)
 
     state["trace"].append(
         {
@@ -149,4 +163,8 @@ def product_faq(state: GraphState):
         }
     )
 
-    return {**state, "answer": response.response}
+    return {
+        **state,
+        "answer": response.response,
+        "topic": response.topic,
+    }

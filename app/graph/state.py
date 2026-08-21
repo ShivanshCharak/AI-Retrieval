@@ -7,6 +7,7 @@ class GraphState(TypedDict, total=False):
 
     web_search: bool
     deep_search: bool
+    topic: str
 
     route: str
 

@@ -12,20 +12,24 @@ import { useConversationSync } from "./hooks/useConersationSync";
 import MessageList from "./components/MessageList";
 
 import { useState, useEffect } from "react";
+type TraceNode = {
+  node: string;
+  latency_ms: number;
+};
 
 interface MainAreaProps {
   userName?: string;
   sidebarVisibility: boolean;
   conversationId?: number | null;
+  traceNode: TraceNode[],
+  setTraceNode: React.Dispatch<
+    React.SetStateAction<TraceNode[]>
+  >; 
   setConversationId: React.Dispatch<
     React.SetStateAction<number | null>
   >;
 }
 
-type TraceNode = {
-  node: string;
-  latency_ms: number;
-};
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -42,17 +46,21 @@ export default function MainArea({
   sidebarVisibility,
   conversationId = null,
   setConversationId,
+  traceNode,
+  setTraceNode
 }: MainAreaProps) {
   const [message, setMessage] = useState<ChatMessage[]>([]);
   const [isChatting, setIsChatting] = useState(false);
   const [status, setStatus] = useState([]);
-  const [traceNode, setTraceNode] = useState<TraceNode[]>([]);
+
 
   useEffect(() => {
   if (!conversationId) {
     setMessage([]);
     return;
   }
+
+  console.log("tracenode in maiarea", traceNode)
 
   const loadConversation = async () => {
     try {
@@ -123,6 +131,7 @@ return (
         chatting={false}
         setChatting={setIsChatting}
         setTraceNode={setTraceNode}
+        conversationId = {conversationId}
         status={status}
         setStatus={setStatus}
       />
@@ -140,6 +149,7 @@ return (
         traceNode={traceNode}
       />
     </div>
+  
 
     <div className="absolute bottom-4 w-full  flex justify-center">
       <ChatInputBox
@@ -148,6 +158,7 @@ return (
         message={message}
         chatting={true}
         setChatting={setIsChatting}
+        conversationId = {conversationId}
         setTraceNode={setTraceNode}
         status={status}
         setStatus={setStatus}

@@ -25,6 +25,7 @@ interface ChatInputBoxProps {
   setTraceNode: React.Dispatch<SetStateAction<TraceNode[]>>
   message:{role:"user"|"assistant";content: string, loading:boolean, file?:{name:string, type:string}}[]
   status: string
+  conversationId: string
 
   
 }
@@ -36,6 +37,7 @@ export default function ChatInputBox({
   setMessage,
   setChatting,
   setTraceNode,
+  conversationId,
   message,
   setStatus,
 }: ChatInputBoxProps) {
@@ -45,6 +47,7 @@ export default function ChatInputBox({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [webSearch, setWebSearch] = useState<boolean>(false);
     const [deepSearch, setDeepSearch] = useState<boolean>(false);
+    console.log("conversatoon",conversationId)
 
     useEffect(()=>{
       if (message.length > 0){
@@ -58,6 +61,11 @@ export default function ChatInputBox({
     formdata.append("model", selectedModel);
     formdata.append("web_search", String(webSearch));
     formdata.append("deep_search", String(deepSearch))
+    formdata.append(
+  "conversation_id",
+  String(conversationId)
+);
+console.log(conversationId)
 
     if (!input.trim()) return;
     onSend?.(input.trim(), selectedModel, file, webSearch);
@@ -192,7 +200,7 @@ while (true) {
 
     console.log("COMPLETE:", data);
 
-    setTraceNode(data.trace || []);
+    setTraceNode(data|| []);
 
     break;
 

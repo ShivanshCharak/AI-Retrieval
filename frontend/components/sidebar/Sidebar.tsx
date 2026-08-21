@@ -14,16 +14,17 @@ import getChatHistory from "./hooks/useChatHistory";
 interface SidebarProps {
   activeChat: string | null;
   onSelect: (id: string) => void;
-
+  title: string
   sidebarVisibility: boolean,
   setSidebarVisibility: React.Dispatch<SetStateAction<boolean>>
 }
 
 
 
-export default function Sidebar({ activeChat, onSelect, sidebarVisibility, setSidebarVisibility }: SidebarProps) {
+export default function Sidebar({ activeChat, onSelect, sidebarVisibility,title, setSidebarVisibility }: SidebarProps) {
 
  const [chatHistory, setChatHistory] = useState<ChatGroup[]>([]);
+
 
 useEffect(() => {
   async function loadHistory() {
@@ -44,6 +45,7 @@ useEffect(() => {
     }
   };
 
+  console.log("trace node in sidebar", title)
   handleResize(); 
 
   window.addEventListener("resize", handleResize);
@@ -53,27 +55,71 @@ useEffect(() => {
   };
 }, [setSidebarVisibility]);
   return (
-   <aside className={` relative ${sidebarVisibility ? "w-[17%]":"w-[50px] "} shrink-0 px-2  bg-white border-r border-gray-100 h-screen transition-all duration-300 ease-in-out `}>
-      
-      <div className=" flex alig px-1 pt-5 pb-3">
-      {sidebarVisibility &&<SidebarSearch />}
-      {/* <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-right-icon lucide-panel-right"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M15 3v18"/></svg> */}
-     <Menu color="gray"  className="cursor-pointer mt-1 ml-1" onClick={()=>(
-       setSidebarVisibility((prev)=> !prev)
-      )} />
+<aside
+  className={`
+    relative
+    flex
+    flex-col
+    h-screen
+    shrink-0
+    bg-white
+    border-r
+    border-gray-100
+    transition-all
+    duration-300
+    ease-in-out
+    ${sidebarVisibility ? "w-[280px]" : "w-[56px]"}
+  `}
+>
+  {/* Header */}
+  <div className="shrink-0 flex items-center px-3 pt-5 pb-3">
+    {sidebarVisibility && <SidebarSearch />}
+
+    <Menu
+      color="gray"
+      className="cursor-pointer mt-1 ml-1 shrink-0"
+      onClick={() => setSidebarVisibility((prev) => !prev)}
+    />
+  </div>
+
+  {/* New chat */}
+  <div className="shrink-0 px-3">
+    <NewChatButton
+      title={title}
+      setChatHistory={setChatHistory}
+      visibility={sidebarVisibility}
+      onSelect={onSelect}
+    />
+  </div>
+
+  {/* Chat history */}
+  {sidebarVisibility && (
+    <div className="min-h-0 flex-1">
+      <div className="px-3 mt-5 mb-2">
+        <span className="text-xs font-semibold text-gray-500">
+          Recents
+        </span>
       </div>
-      <NewChatButton  setChatHistory = {setChatHistory} visibility={sidebarVisibility} />
-     
 
+      <ChatHistory
+        groups={chatHistory}
+        activeId={activeChat}
+        onSelect={onSelect}
+      />
+    </div>
+  )}
 
-      {sidebarVisibility && <ChatHistory groups={chatHistory} activeId={activeChat} onSelect={onSelect} />}
-      <div className="absolute bottom-4 w-full">
+  {/* Bottom */}
+  <div className="shrink-0 bg-white border-t border-gray-100 px-3 py-3">
+    <SidebarNav
+      links={NAV_LINKS}
+      visibility={sidebarVisibility}
+    />
 
-        <SidebarNav links={NAV_LINKS} visibility={sidebarVisibility} />
-        <AuthBlock  sidebarVisibility={sidebarVisibility}/>
-      </div>
-      {/* </div> */}
-    
-    </aside>
+    <div className="mt-2">
+      <AuthBlock sidebarVisibility={sidebarVisibility} />
+    </div>
+  </div>
+</aside>
   );
 }

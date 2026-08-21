@@ -11,10 +11,12 @@ export async function POST(req: Request) {
   const model = formData.get("model");
   const file = formData.get("file");
   const deepSearch = formData.get("deep_search")
+  const conversationId = formData.get("conversation_id")
 
   if (message) backendForm.append("message", message);
   if (model) backendForm.append("model", model);
   if (deepSearch) backendForm.append("deep_search", deepSearch)
+    backendForm.append("conversation_id", conversationId)
 
   if (file && file instanceof File) {
     backendForm.append("file", file);
