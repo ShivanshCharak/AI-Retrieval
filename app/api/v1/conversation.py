@@ -9,9 +9,9 @@ from fastapi import (
 )
 
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, JSON
+from pydantic import BaseModel, Field
 
-from pydantic import BaseModel
 
 from app.db.models import Conversation
 from app.db.database import get_db
@@ -22,19 +22,31 @@ router = APIRouter()
 SECRET_KEY = "4WfP4JbL6lLQ5zQZ_8K4YxW5RkM8bM7T9dN2L8xR1cA"
 
 
-# --------------------------------------------------
+# ============================================================
 # Schemas
-# --------------------------------------------------
+# ============================================================
+
+
+class Source(BaseModel):
+    label: str
+    title: str
+    page: str
+    source: str
 
 
 class AddMessage(BaseModel):
     role: str
     content: str
+    sources: list[Source] = Field(default_factory=list)
 
 
-# --------------------------------------------------
+class SyncConversation(BaseModel):
+    messages: list[dict]
+
+
+# ============================================================
 # Authentication
-# --------------------------------------------------
+# ============================================================
 
 
 def get_current_user_id(request: Request) -> int:
@@ -47,12 +59,15 @@ def get_current_user_id(request: Request) -> int:
         )
 
     try:
+        print("befire payload")
+
         payload = jwt.decode(
             token,
             SECRET_KEY,
             algorithms=["HS256"],
         )
 
+        print("payload", payload)
         user_id = payload.get("user_id")
 
         if user_id is None:
@@ -64,15 +79,18 @@ def get_current_user_id(request: Request) -> int:
         return int(user_id)
 
     except jwt.InvalidTokenError:
+        print("JWT ERROR:", type(e).__name__)
+        print("JWT ERROR DETAIL:", str(e))
+
         raise HTTPException(
             status_code=401,
             detail="Invalid token",
         )
 
 
-# --------------------------------------------------
-# Get all conversations for current user
-# --------------------------------------------------
+# ============================================================
+# Get all conversations
+# ============================================================
 
 
 @router.get("/conversations")
@@ -97,9 +115,9 @@ async def all_conversations(
     }
 
 
-# --------------------------------------------------
+# ============================================================
 # Get one conversation
-# --------------------------------------------------
+# ============================================================
 
 
 @router.get("/conversation/{conv_id}")
@@ -121,12 +139,23 @@ async def get_conversation(
             detail="Conversation not found",
         )
 
-    return {"result": conversation}
+    return {
+        "result": {
+            "id": conversation.id,
+            "user_id": conversation.user_id,
+            "title": conversation.title,
+            "messages": conversation.messages,
+            "sources": conversation.sources,
+            "files": conversation.files,
+            "created_at": conversation.created_at,
+            "updated_at": conversation.updated_at,
+        }
+    }
 
 
-# --------------------------------------------------
+# ============================================================
 # Create conversation
-# --------------------------------------------------
+# ============================================================
 
 
 @router.post("/conversation")
@@ -139,7 +168,7 @@ async def create_conversation(
     files = []
 
     if uploaded_files:
-        files = [file.filename for file in uploaded_files]
+        files = [file.filename for file in uploaded_files if file.filename]
 
     conversation = Conversation(
         user_id=user_id,
@@ -149,6 +178,7 @@ async def create_conversation(
             {
                 "role": "user",
                 "content": message,
+                "sources": [],
             }
         ],
         files=files,
@@ -164,9 +194,9 @@ async def create_conversation(
     }
 
 
-# --------------------------------------------------
+# ============================================================
 # Add message to existing conversation
-# --------------------------------------------------
+# ============================================================
 
 
 @router.post("/conversation/{conv_id}/message")
@@ -189,23 +219,30 @@ async def add_message(
             detail="Conversation not found",
         )
 
-    is_first_message = len(conversation.messages) == 0
+    new_message = {
+        "role": data.role,
+        "content": data.content,
+        "sources": [source.model_dump() for source in data.sources],
+    }
 
     conversation.messages = [
         *conversation.messages,
-        {
-            "role": data.role,
-            "content": data.content,
-        },
+        new_message,
     ]
 
     db.commit()
+    db.refresh(conversation)
 
-    return {"success": True}
+    return {
+        "success": True,
+        "conversation_id": conversation.id,
+        "message": new_message,
+    }
 
 
-class SyncConversation(BaseModel):
-    messages: list[dict]
+# ============================================================
+# Sync entire conversation
+# ============================================================
 
 
 @router.put("/conversation/{conv_id}/sync")
@@ -236,7 +273,13 @@ async def sync_conversation(
     return {
         "success": True,
         "conversation_id": conversation.id,
+        "messages": conversation.messages,
     }
+
+
+# ============================================================
+# Create empty conversation
+# ============================================================
 
 
 @router.post("/conversation/new")

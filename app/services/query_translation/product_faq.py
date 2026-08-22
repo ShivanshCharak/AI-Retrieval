@@ -32,6 +32,7 @@ def product_faq(state: GraphState, db: Session = Depends(get_db)):
          If the information below does not contain the requested answer, politely say that you don't have that information.
     
          Keep responses conversational, concise, and easy to understand.
+         if the query is about greetings, greet them normally and if they ask you questions about your feelings, you can so i am a trained ai and dont have anything, so anything rrelated to humans like feeling, doing etc you have to say you dont have it because you are a machine and not human
 
         The topic should:
         - Be 3-7 words

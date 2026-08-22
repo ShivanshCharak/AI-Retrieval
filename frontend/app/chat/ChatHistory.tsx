@@ -1,7 +1,6 @@
 import { ChatGroup } from "./types";
 import { useEffect, useState } from "react";
 
-
 interface ChatHistoryProps {
   groups: ChatGroup[];
   activeId: string | null;
@@ -14,18 +13,24 @@ export default function ChatHistory({
   onSelect,
 }: ChatHistoryProps) {
   const [typedTitle, setTypedTitle] = useState("");
+  console.log("grouos", groups)
+
+  const firstTitle = groups?.[0]?.title ?? "";
+  console.log("first",firstTitle)
 
   useEffect(() => {
-    if (!groups?.length) return;
-
-    const title = groups[0].title;
-    setTypedTitle("");
+    if (!firstTitle) {
+      setTypedTitle("");
+      return;
+    }
 
     let index = 0;
+    setTypedTitle("");
 
     const interval = setInterval(() => {
-      if (index < title.length) {
-        setTypedTitle(title.slice(0, index + 1));
+      if (index < firstTitle.length) {
+        setTypedTitle(firstTitle.slice(0, index + 1));
+        console.log("t",typedTitle)
         index++;
       } else {
         clearInterval(interval);
@@ -33,7 +38,7 @@ export default function ChatHistory({
     }, 50);
 
     return () => clearInterval(interval);
-  }, [groups]);
+  }, [firstTitle]);
 
   return (
     <nav className="w-full h-full overflow-y-auto overflow-x-hidden px-2">
@@ -61,7 +66,7 @@ export default function ChatHistory({
                 }
               `}
             >
-              {index === 0 ? typedTitle : group.title}
+              {index === 0 ? typedTitle : group.title ?? "New Chat"}
             </button>
           </li>
         ))}

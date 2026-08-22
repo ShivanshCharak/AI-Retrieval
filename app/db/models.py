@@ -1,5 +1,5 @@
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import String, ForeignKey, Column
 from sqlalchemy.dialects.postgresql import JSONB
 from app.db.database import engine
 from sqlalchemy import DateTime, func
@@ -30,6 +30,7 @@ class Conversation(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     title: Mapped[str | None] = mapped_column(String(100), nullable=True)
     messages: Mapped[list] = mapped_column(JSONB, default=list)
+    sources: Mapped[list] = mapped_column(JSONB, default=list)
     files: Mapped[list] = mapped_column(JSONB, default=list, nullable=False)
     created_at: Mapped[DateTime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

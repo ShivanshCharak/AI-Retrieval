@@ -52,6 +52,7 @@ export default function MainArea({
   const [message, setMessage] = useState<ChatMessage[]>([]);
   const [isChatting, setIsChatting] = useState(false);
   const [status, setStatus] = useState([]);
+  const [sources, setSources] = useState([])
 
 
   useEffect(() => {
@@ -80,6 +81,8 @@ export default function MainArea({
       console.log("Loaded conversation:", data);
 
       setMessage(data.result.messages ?? []);
+      setSources(data.result.sources??[])
+      
 
     } catch (error) {
       console.error("Failed to load conversation:", error);
@@ -112,6 +115,7 @@ export default function MainArea({
   });
 
   
+  console.log("status", status)
 return (
   <main
     className={`flex-1 flex flex-col bg-gray-50 px-6 ${
@@ -122,6 +126,7 @@ return (
   <div className="flex-1 w-full flex flex-col items-center justify-center">
     <OrbIcon />
     <Greeting name={userName ?? ""} />
+    
 
     <div className="w-full max-w-2xl mt-6">
       <ChatInputBox
@@ -129,6 +134,8 @@ return (
         setMessage={setMessage}
         message={message}
         chatting={false}
+        sources = {sources}
+        setSources ={setSources}
         setChatting={setIsChatting}
         setTraceNode={setTraceNode}
         conversationId = {conversationId}
@@ -141,30 +148,41 @@ return (
       actions={QUICK_ACTIONS}
     />
   </div>
-) : (
-  <>
-    <div className="w-full mt-[50px] overflow-y-auto flex justify-center">
-      <MessageList
-        messages={message}
-        traceNode={traceNode}
-      />
-    </div>
-  
+)  : (
+  <div className="flex-1 flex flex-col min-h-0">
 
-    <div className="absolute bottom-4 w-full  flex justify-center">
+    <div className="flex-1 overflow-y-auto w-full pt-[50px] min-h-0">
+
+      <div className="w-full flex justify-center">
+        <MessageList
+          messages={message}
+          traceNode={traceNode}
+          sources={sources}
+        />
+      </div>
+
+      {/* Gives you 700px of additional scroll range */}
+      <div className="h-[400px]" />
+
+    </div>
+
+    <div className="w-full flex justify-center pb-4">
       <ChatInputBox
         onSend={sendMessage}
         setMessage={setMessage}
         message={message}
         chatting={true}
+        sources={sources}
+        setSources={setSources}
         setChatting={setIsChatting}
-        conversationId = {conversationId}
+        conversationId={conversationId}
         setTraceNode={setTraceNode}
         status={status}
         setStatus={setStatus}
       />
     </div>
-  </>
+
+  </div>
 )}
   </main>
 );

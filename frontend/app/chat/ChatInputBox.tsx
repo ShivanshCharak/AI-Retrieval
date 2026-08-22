@@ -27,8 +27,10 @@ interface ChatInputBoxProps {
   status: string
   conversationId: string
 
+
   
 }
+
 
 
 export default function ChatInputBox({
@@ -37,17 +39,20 @@ export default function ChatInputBox({
   setMessage,
   setChatting,
   setTraceNode,
+  
   conversationId,
   message,
   setStatus,
 }: ChatInputBoxProps) {
   const [input, setInput] = useState("");
+  console.log("message", message)
+  
   const [selectedModel, setSelectedModel] = useState(MODELS[0]);
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [webSearch, setWebSearch] = useState<boolean>(false);
-    const [deepSearch, setDeepSearch] = useState<boolean>(false);
-    console.log("conversatoon",conversationId)
+  const [deepSearch, setDeepSearch] = useState<boolean>(false);
+  console.log("conversatoon",conversationId)
 
     useEffect(()=>{
       if (message.length > 0){
@@ -82,7 +87,7 @@ const res = await fetch("/api/chat", {
 if (!res.body) return;
 const reader = res.body!.getReader();
 const decoder = new TextDecoder();
-console.log(reader)
+console.log("reader",reader)
 
 
 let buffer = "";
@@ -196,13 +201,30 @@ while (true) {
     return;
 
 
-  case "complete":
+case "complete":
 
-    console.log("COMPLETE:", data);
+  console.log("COMPLETE:", data);
 
-    setTraceNode(data|| []);
+  setTraceNode(data.trace || []);
 
-    break;
+  setMessage(prev => {
+    const updated = [...prev];
+
+    updated[updated.length - 1] = {
+      ...updated[updated.length - 1],
+      loading: false,
+      sources: data.sources || [],
+      title: data.title,
+      confidence: data.confidence,
+      latency_ms: data.latency_ms,
+    };
+
+    return updated;
+  });
+
+
+
+  break;
 
 
   case "error":
