@@ -1,12 +1,10 @@
-import json
 import re
 import time
 
 from pydantic import BaseModel
-from app.services.llm.llm_service import llm
 from app.services.retrieval.vector_search import vector_search
 from app.services.retrieval.memory_search import memory_search
-from app.services.retrieval.github_search import _scope_key, github_parser
+from app.services.retrieval.github_search import github_parser
 from app.services.retrieval_service import retrieve_context
 
 
@@ -132,14 +130,12 @@ def contains_memory_reference(query: str) -> bool:
 def deterministic_retrieval_plan(query: str):
     """
     Returns:
-        RetrievalDecision | None
+        (RetrievalDecision, str)
 
-    None means:
-        No explicit source was detected.
-        Let the LLM decide.
+    Always returns a concrete plan. There is no LLM fallback —
+    if no explicit source is detected, a default general-purpose
+    plan is used instead.
     """
-
-    q = query.lower()
 
     # ========================================================
     # 1. GITHUB URL
@@ -267,12 +263,24 @@ def deterministic_retrieval_plan(query: str):
         )
 
     # ========================================================
-    # NO EXPLICIT SOURCE
+    # 7. NO EXPLICIT SOURCE — DEFAULT PLAN
     #
-    # Return None so the LLM can handle ambiguous queries.
+    # No LLM fallback. Default to vector + bm25 retrieval,
+    # which covers the general case of answering from
+    # indexed/uploaded content with lexical backup.
     # ========================================================
 
-    return None, None
+    return (
+        RetrievalDecision(
+            use_memory=False,
+            use_vector=True,
+            use_graph=False,
+            use_repo=False,
+            use_bm25=True,
+            confidence=0.5,
+        ),
+        "No explicit source detected → default vector + BM25 retrieval",
+    )
 
 
 # ============================================================
@@ -287,190 +295,32 @@ def retrieval_node(state):
     userId = state["userId"]
 
     # ========================================================
-    # STEP 1 — DETERMINISTIC ROUTING
+    # STEP 1 — DETERMINISTIC ROUTING (always deterministic now)
     # ========================================================
 
     plan, explanation = deterministic_retrieval_plan(query)
 
-    if plan is not None:
+    latency = (time.time() - start) * 1000
 
-        latency = (time.time() - start) * 1000
+    print("DETERMINISTIC RETRIEVAL PLAN")
+    print("PLAN:", plan)
+    print("CONFIDENCE:", plan.confidence)
+    print("EXPLANATION:", explanation)
 
-        print("DETERMINISTIC RETRIEVAL PLAN")
-        print("PLAN:", plan)
-        print("CONFIDENCE:", plan.confidence)
-        print("EXPLANATION:", explanation)
-
-        state["trace"].append(
-            {
-                "node": "retrieval router",
-                "latency_ms": latency,
-                "confidence": plan.confidence,
-                "input": query,
-                "output": plan,
-                "routing_type": "deterministic",
-                "explanation": explanation,
-            }
-        )
+    state["trace"].append(
+        {
+            "node": "retrieval router",
+            "latency_ms": latency,
+            "confidence": plan.confidence,
+            "input": query,
+            "output": plan,
+            "routing_type": "deterministic",
+            "explanation": explanation,
+        }
+    )
 
     # ========================================================
-    # STEP 2 — LLM FALLBACK
-    # ========================================================
-
-    else:
-
-        metadata = ""
-
-        with open(
-            f"app/db/metadata/collection_metadata_{userId}.json",
-            "r",
-        ) as f:
-            metadata = json.load(f)
-
-        with open(f"scope_cache/{_scope_key(userId)}.json") as f:
-            repo_metadata = json.load(f)
-
-        prompt = f"""
-You are a retrieval planner.
-
-Your task is to decide which retrieval sources should be used
-to answer the user's question.
-
-AVAILABLE RETRIEVAL SOURCES:
-
-1. MEMORY
-2. VECTOR DATABASE
-3. KNOWLEDGE GRAPH
-4. REPOSITORY
-5. BM25
-
-IMPORTANT:
-
-Explicit source instructions have already been checked
-deterministically.
-
-You are only being called because no explicit source was
-detected.
-
-Therefore, determine which sources are actually required
-to answer the query.
-
-Do NOT enable sources merely because they contain related
-information.
-
-MEMORY:
-
-Use memory when answering requires previously stored
-personal information about the user.
-
-VECTOR:
-
-Use vector retrieval when answering requires information
-from uploaded/indexed documents.
-
-REPOSITORY:
-
-Use repository retrieval when answering requires source
-code or repository information.
-
-GRAPH:
-
-Use graph retrieval when answering requires relationships,
-dependencies, or connected entities.
-
-BM25:
-
-Use BM25 when lexical/exact matching would help retrieve
-the required information.
-
-Multiple sources may be selected when genuinely required.
-
-Examples:
-
-"Explain the database architecture."
-
-Possible result:
-
-{{
-    "use_memory": false,
-    "use_vector": true,
-    "use_graph": false,
-    "use_repo": true,
-    "use_bm25": true
-}}
-
-"Explain how authentication works and where it is implemented."
-
-{{
-    "use_memory": false,
-    "use_vector": false,
-    "use_graph": false,
-    "use_repo": true,
-    "use_bm25": true
-}}
-
-"Compare the authentication documentation with its implementation."
-
-{{
-    "use_memory": false,
-    "use_vector": true,
-    "use_graph": false,
-    "use_repo": true,
-    "use_bm25": true
-}}
-
-METADATA:
-
-{metadata}
-
-REPOSITORY METADATA:
-
-{repo_metadata}
-
-USER QUERY:
-
-{query}
-
-Return ONLY:
-
-{{
-    "use_memory": true/false,
-    "use_vector": true/false,
-    "use_graph": true/false,
-    "use_repo": true/false,
-    "use_bm25": true/false,
-    "confidence": 0.0
-}}
-"""
-
-        structured_llm = llm.with_structured_output(RetrievalDecision)
-
-        plan = structured_llm.invoke(
-            [
-                ("system", prompt),
-                ("human", query),
-            ]
-        )
-
-        latency = (time.time() - start) * 1000
-
-        print("LLM RETRIEVAL PLAN")
-        print("PLAN:", plan)
-        print("CONFIDENCE:", plan.confidence)
-
-        state["trace"].append(
-            {
-                "node": "retrieval router",
-                "latency_ms": latency,
-                "confidence": plan.confidence,
-                "input": query,
-                "output": plan,
-                "routing_type": "llm",
-            }
-        )
-
-    # ========================================================
-    # STEP 3 — RETRIEVAL
+    # STEP 2 — RETRIEVAL
     # ========================================================
 
     docs = []

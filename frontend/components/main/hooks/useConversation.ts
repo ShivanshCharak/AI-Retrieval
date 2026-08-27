@@ -65,6 +65,7 @@ export function useConversation({
         );
 
         const data = await response.json();
+        console.log("data",data)
 
         setConversationId(
           data.conversation_id

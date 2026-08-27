@@ -22,10 +22,10 @@ OUTPUT_PATH = Path(__file__).parent / "results" / f"retrieval_eval_{timestamp}.c
 K_VALUES = [1, 3, 5, 10]
 
 # Number of candidates retrieved BEFORE reranking
-RETRIEVAL_K = 50
+RETRIEVAL_K = 20
 
 # Number of documents kept AFTER reranking
-RERANK_K = 50
+RERANK_K = 20
 
 
 # =========================================================

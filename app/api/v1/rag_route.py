@@ -38,6 +38,7 @@ async def handle_rag_route(final_state, user_id, message, conversation_id, db):
     prompt = build_rag_prompt(message, formatted.context_str)
 
     structured_llm = llm.with_structured_output(AnswerWithTitle)
+    print(structured_llm)
     response = await structured_llm.ainvoke(prompt)
 
     conversation.title = response.topic

@@ -25,7 +25,7 @@ client = QdrantClient(url="http://localhost:6333")
 def retrieve_context(
     query: str,
     user_id: int,
-    k: int = 50,
+    k: int = 20,
     repo_url: str | None = None,
 ):
 

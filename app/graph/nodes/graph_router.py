@@ -232,6 +232,7 @@ Repository metadata:
             ("human", query),
         ]
     )
+    print("hey", decision)
 
     latency = (Time.time() - start) * 1000
 
