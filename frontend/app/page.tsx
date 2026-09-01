@@ -12,7 +12,7 @@ type TraceNode = {
 };
 export default function ChatPage() {
     const [sidebarVisibility, setSidebarVisibility]= useState<boolean>(true)
-  const [activeChat, setActiveChat] = useState<string | null>("1");
+  const [activeChat, setActiveChat] = useState<string | null>(null);
   const [traceNode, setTraceNode] = useState<TraceNode[]>([]);
   const [conversationId, setConversationId] =
   useState<number | null>(null);
@@ -22,7 +22,7 @@ export default function ChatPage() {
 
   const handleNewChat = () => setActiveChat(null);
   useEffect(()=>{
-    setConversationId(Number(activeChat))
+  setConversationId(Number(activeChat))
   },[activeChat])
 
   useEffect(()=>{

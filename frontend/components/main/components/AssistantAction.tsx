@@ -54,9 +54,9 @@ export default function AssistantActions({
         </button>
       ))}
 
-      {traceNode.length > 0 && (
+      {/* {traceNode.length > 0 && (
         <ResponseTime trace={traceNode} />
-      )}
+      )} */}
     </div>
   );
 }

@@ -5,28 +5,42 @@ import os
 from app.services.llm.llm_service import llm
 
 
+class Topic(BaseModel):
+    name: str
+    explanation: str
+
+
 class CollectionMetadata(BaseModel):
     summary: str
-    topics: list[str]
+    topics: list[Topic]
 
 
 def generate_collection_metadata(docs):
 
-    text = "\n".join(doc.page_content[:1000] for doc in docs[:5])
+    content = docs.page_content
+
+    # Take 10%, but never more than 20,000 characters
+    limit = min(
+        int(len(content) * 0.10),
+        20_000,
+    )
+
+    text = content[:limit]
 
     structured = llm.with_structured_output(CollectionMetadata)
 
     prompt = f"""
-            Analyze this document collection.
+        Analyze this document.
 
-            Generate:
+        Return:
+        - A concise summary.
+        - The 10 most important topics.
+        - For each topic, explain its context in 80-120 words.
+        - Only include topics actually supported by the document.
 
-            1. Short summary
-            2. Top 10 topics each topic shud have atleats 100words scentnec explaining the context of the current topic present in the pdf
-
-            Document:
-            {text}
-            """
+        Document:
+        {text}
+        """
     ans = structured.invoke(prompt)
 
     return ans

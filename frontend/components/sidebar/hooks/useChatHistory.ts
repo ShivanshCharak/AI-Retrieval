@@ -1,18 +1,37 @@
-export default async function getChatHistory() {
-  try {
-    const response = await fetch(
-      "http://localhost:8000/api/v1/conversations",
-      {
-        credentials: "include",
-        method: "GET",
+import { useCallback, useState } from "react";
+
+export default function useChatHistory() {
+  const [chatHistory, setChatHistory] = useState<ChatGroup[]>([]);
+
+  const refreshChatHistory = useCallback(async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:8000/api/v1/conversations",
+        {
+          credentials: "include",
+          method: "GET",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch chat history");
       }
-    );
 
-    const parsedData = await response.json();
+      const data = await response.json();
+     
 
-    return parsedData.result;
-  } catch (error) {
-    console.error("Something went wrong", error);
-    return [];
-  }
+      setChatHistory(data.result);
+
+      return data.result;
+    } catch (error) {
+      console.error("Failed to load chat history:", error);
+      return [];
+    }
+  }, []);
+
+  return {
+    chatHistory,
+    setChatHistory,
+    refreshChatHistory,
+  };
 }

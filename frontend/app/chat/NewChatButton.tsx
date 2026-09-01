@@ -1,5 +1,6 @@
 import { Plus } from "lucide-react";
 import { useEffect } from "react";
+import ChatHistory from "./ChatHistory";
 
 interface NewChatButtonProps {
   title: string;
@@ -10,6 +11,7 @@ interface NewChatButtonProps {
 
 export default function NewChatButton({
   visibility,
+  chatHistory,
   setChatHistory,
   onSelect,
   title,
@@ -47,7 +49,8 @@ export default function NewChatButton({
 
       const data = await response.json();
 
-      console.log("Created:", data);
+      console.log("Created:", data, chatHistory);
+    
 
       localStorage.clear();
 

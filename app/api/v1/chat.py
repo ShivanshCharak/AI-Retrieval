@@ -40,6 +40,7 @@ async def query(
 
     async def generate():
         try:
+            print("message")
             final_state = None
 
             initial_state: GraphState = {

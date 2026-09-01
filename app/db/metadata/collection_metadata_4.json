@@ -1,15 +1,21 @@
 {
-  "summary": "The document 'Database Internals' by Alex Petrov explores the foundational principles of distributed data systems, focusing on how these systems manage data integrity, consistency, and redundancy. The book provides an in-depth analysis of key concepts such as horizontal scaling, replication, fault tolerance, and query optimization. It emphasizes the importance of distributed databases in modern applications and their role in enabling scalable, reliable data management. The text is structured to explain complex topics through practical examples and technical insights, making it a valuable resource for professionals and students interested in database systems.",
+  "summary": "The text discusses the role of storage engines in database systems, comparing different storage engines like BerkeleyDB, LevelDB, and RocksDB. It highlights key concepts such as data structures (e.g., B-Trees, log-structured storage), replication in distributed systems, consistency models, and consensus algorithms (e.g., Paxos, Raft). The text also touches on challenges in distributed systems, such as fault tolerance and scalability, and emphasizes the importance of storage engines in enabling efficient data management and performance.",
   "topics": [
-    "Distributed Data Systems and Their Role in Modern Applications",
-    "Data Consistency and Replication Strategies",
-    "Fault Tolerance and Recovery Mechanisms",
-    "Horizontal Scaling and Its Impact on Performance",
-    "Data Partitioning and Sharding Techniques",
-    "Indexing and Query Optimization in Distributed Databases",
-    "Security and Access Control in Distributed Systems",
-    "Transaction Management and ACID Properties",
-    "Performance Optimization in Distributed Environments",
-    "Case Studies and Real-World Applications of Distributed Databases"
+    {
+      "name": "Storage Engines",
+      "explanation": "Storage engines are critical components of database systems, responsible for managing data storage, retrieval, and performance. They handle operations like indexing, compression, and caching, and are essential for optimizing database performance and scalability."
+    },
+    {
+      "name": "Distributed Systems",
+      "explanation": "The text explores distributed systems concepts, including replication, consistency models (e.g., ACID), and consensus algorithms (e.g., Paxos, Raft). These are crucial for ensuring data integrity and fault tolerance in decentralized environments."
+    },
+    {
+      "name": "Data Structures and Algorithms",
+      "explanation": "Key data structures like B-Trees and log-structured storage are discussed, along with algorithms for efficient data management, such as compaction and garbage collection, which are vital for maintaining performance in large-scale databases."
+    },
+    {
+      "name": "Performance and Scalability",
+      "explanation": "The text addresses challenges in scaling databases, including handling high write throughput, ensuring low latency, and optimizing for distributed environments. Storage engines and algorithms play a pivotal role in overcoming these challenges."
+    }
   ]
 }

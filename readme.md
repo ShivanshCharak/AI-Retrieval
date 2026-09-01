@@ -1,8 +1,6 @@
-Sure — here's a concise README that matches the architecture and is suitable for your GitHub project.
 
 # AI Retrieval System
-
-An advanced **hybrid RAG and GitHub code-intelligence system** designed to answer questions from uploaded documents and GitHub repositories using deterministic routing, dense + sparse retrieval, reranking, and LLM-based answer generation.
+ **hybrid RAG and GitHub code-intelligence system** designed to answer questions from uploaded documents and GitHub repositories using deterministic routing, dense + sparse retrieval, reranking, and LLM-based answer generation.
 
 ## Architecture
 

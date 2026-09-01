@@ -155,27 +155,11 @@ def deterministic_retrieval_plan(query: str):
             "GitHub URL detected → repository retrieval",
         )
 
-    # ========================================================
-    # 2. EXPLICIT REPOSITORY / CODE SOURCE
-    # ========================================================
-
     repo_requested = contains_repository_reference(query)
-
-    # ========================================================
-    # 3. EXPLICIT DOCUMENT SOURCE
-    # ========================================================
 
     document_requested = contains_document_reference(query)
 
-    # ========================================================
-    # 4. EXPLICIT MEMORY SOURCE
-    # ========================================================
-
     memory_requested = contains_memory_reference(query)
-
-    # ========================================================
-    # 5. MULTIPLE EXPLICIT SOURCES
-    # ========================================================
 
     # User explicitly wants repository + document
     if repo_requested and document_requested:
@@ -218,10 +202,6 @@ def deterministic_retrieval_plan(query: str):
             ),
             "Explicit document + memory request",
         )
-
-    # ========================================================
-    # 6. SINGLE EXPLICIT SOURCE
-    # ========================================================
 
     if repo_requested:
         return (

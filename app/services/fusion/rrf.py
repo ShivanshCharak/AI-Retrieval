@@ -1,50 +1,19 @@
-from collections import defaultdict
+def reciprocal_rank_fusion(dense_results, sparse_results, k=20):
+    scores = {}
+    results = {}
 
+    for rank, point in enumerate(dense_results, start=1):
+        point_id = str(point.id)
 
-def reciprocal_rank_fusion(documents, k: int = 60):
-    scores = defaultdict(float)
-    doc_lookup = {}
+        scores[point_id] = scores.get(point_id, 0) + 1 / (k + rank)
+        results[point_id] = point
 
-    for rank, doc in enumerate(documents):
-        # LangChain Document
-        if hasattr(doc, "metadata"):
-            doc_id = doc.metadata.get("id")
-            # Fallback if metadata id doesn't exist
-            if not doc_id:
-                doc_id = doc.page_content
+    for rank, point in enumerate(sparse_results, start=1):
+        point_id = str(point.id)
 
-        # Dictionary support, if you ever have dicts
-        elif isinstance(doc, dict):
-            doc_id = doc.get("id") or doc.get("content")
-        else:
-            continue
+        scores[point_id] = scores.get(point_id, 0) + 1 / (k + rank)
+        results[point_id] = point
 
-        scores[doc_id] += 1 / (k + rank + 1)
+    ranked_ids = sorted(scores, key=scores.get, reverse=True)
 
-        # Keep original Document
-        doc_lookup[doc_id] = doc
-
-    fused_docs = []
-
-    for doc_id, score in scores.items():
-        doc = doc_lookup[doc_id]
-        if hasattr(doc, "metadata"):
-
-            fused_doc = doc.model_copy(deep=True)
-            fused_doc.metadata["rrf_score"] = score
-        else:
-            fused_doc = doc.copy()
-            fused_doc["score"] = score
-
-        fused_docs.append(fused_doc)
-
-    fused_docs.sort(
-        key=lambda doc: (
-            doc.metadata.get("rrf_score", 0)
-            if hasattr(doc, "metadata")
-            else doc.get("score", 0)
-        ),
-        reverse=True,
-    )
-
-    return fused_docs
+    return [results[point_id] for point_id in ranked_ids]

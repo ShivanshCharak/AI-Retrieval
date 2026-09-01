@@ -41,8 +41,10 @@ async def handle_rag_route(final_state, user_id, message, conversation_id, db):
     print(structured_llm)
     response = await structured_llm.ainvoke(prompt)
 
+    print(response)
     conversation.title = response.topic
     conversation.sources = formatted.sources
+    conversation.answer = conversation.answer
     db.commit()
 
     full_answer = response.answer

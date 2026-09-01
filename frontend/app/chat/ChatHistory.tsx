@@ -1,3 +1,4 @@
+import { group } from "console";
 import { ChatGroup } from "./types";
 import { useEffect, useState } from "react";
 
@@ -13,7 +14,7 @@ export default function ChatHistory({
   onSelect,
 }: ChatHistoryProps) {
   const [typedTitle, setTypedTitle] = useState("");
-  console.log("grouos", groups)
+
 
   const firstTitle = groups?.[0]?.title ?? "";
   console.log("first",firstTitle)
@@ -40,10 +41,11 @@ export default function ChatHistory({
     return () => clearInterval(interval);
   }, [firstTitle]);
 
+  console.log("gorups", groups.length)
   return (
     <nav className="w-full h-full overflow-y-auto overflow-x-hidden px-2">
       <ul className="w-full space-y-1">
-        {groups?.map((group, index) => (
+        {groups.length >0  && groups?.map((group, index) => (
           <li key={group.id} className="w-full">
             <button
               onClick={() => onSelect(String(group.id))}

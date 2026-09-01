@@ -1,4 +1,5 @@
 from qdrant_client import QdrantClient
+from app.services.reranking.rerank import rerank_documents
 
 from qdrant_client.models import (
     Filter,
@@ -11,6 +12,7 @@ from qdrant_client.models import (
 )
 
 from langchain_core.documents import Document
+from app.services.fusion.rrf import reciprocal_rank_fusion
 from langchain_ollama import OllamaEmbeddings
 
 from app.db.qdrant_sparse import sparse_model
@@ -24,15 +26,11 @@ client = QdrantClient(url="http://localhost:6333")
 
 def retrieve_context(
     query: str,
-    user_id: int,
+    user_id: str,
     k: int = 20,
     repo_url: str | None = None,
 ):
-
-    # ==================================================
-    # 1. Build filter
-    # ==================================================
-
+    print("hey")
     conditions = [
         FieldCondition(
             key="metadata.user_id",
@@ -49,72 +47,59 @@ def retrieve_context(
         )
 
     search_filter = Filter(must=conditions)
+    print(client.get_collection("documents"))
 
-    # ==================================================
-    # 2. Dense query embedding
-    # ==================================================
+    print(client.count(collection_name="documents", exact=True))
+
+    print(
+        client.scroll(
+            collection_name="documents",
+            limit=1,
+            with_payload=True,
+        )
+    )
 
     dense_vector = embedder.embed_query(query)
 
-    # ==================================================
-    # 3. Sparse BM25 query embedding
-    # ==================================================
-
     sparse_embedding = list(sparse_model.embed([query]))[0]
-
     sparse_vector = SparseVector(
         indices=sparse_embedding.indices.tolist(),
         values=sparse_embedding.values.tolist(),
     )
 
-    # ==================================================
-    # 4. Hybrid retrieval + RRF
-    # ==================================================
-
-    results = client.query_points(
+    dense_results = client.query_points(
         collection_name="documents",
-        prefetch=[
-            # ------------------------------------------
-            # Dense retrieval
-            # ------------------------------------------
-            Prefetch(
-                query=dense_vector,
-                using="dense",
-                filter=search_filter,
-                limit=40,
-            ),
-            # ------------------------------------------
-            # Sparse BM25 retrieval
-            # ------------------------------------------
-            Prefetch(
-                query=sparse_vector,
-                using="sparse",
-                filter=search_filter,
-                limit=40,
-            ),
-        ],
-        # ----------------------------------------------
-        # Reciprocal Rank Fusion
-        # ----------------------------------------------
-        query=FusionQuery(fusion=Fusion.RRF),
-        limit=k,
+        query=dense_vector,
+        using="dense",
+        query_filter=search_filter,
+        limit=10,
+        with_payload=True,
+        with_vectors=False,
+    )
+
+    sparse_results = client.query_points(
+        collection_name="documents",
+        query=sparse_vector,
+        using="sparse",
+        query_filter=search_filter,
+        limit=10,
         with_payload=True,
         with_vectors=False,
     )
 
     # ==================================================
-    # 5. Debug retrieved results
+    # DENSE RESULTS
     # ==================================================
 
     print("\n" + "=" * 100)
-    print("HYBRID RETRIEVAL")
-    print("QUERY:", query)
-    print("RESULTS:", len(results.points))
+    print("DENSE FIRST:", dense_results.points[:2])
+    print("DENSE VECTOR SEARCH")
+    print("=" * 100)
 
-    for rank, result in enumerate(
-        results.points,
-        start=1,
-    ):
+    print("QUERY:", query)
+    print("RESULTS:", len(dense_results.points))
+
+    for rank, result in enumerate(dense_results.points, start=1):
 
         payload = result.payload or {}
 
@@ -126,21 +111,25 @@ def retrieve_context(
         )
 
         print("\n" + "-" * 100)
-
-        print("RANK:", rank)
-        print("RRF SCORE:", result.score)
+        print("DENSE RANK:", rank)
+        print("DENSE SCORE:", result.score)
         print("ID:", result.id)
 
         print("\nCONTENT:")
         print(content[:1500])
 
     # ==================================================
-    # 6. Convert Qdrant results -> LangChain Documents
+    # SPARSE RESULTS
     # ==================================================
 
-    documents = []
+    print("\n" + "=" * 100)
+    print("SPARSE VECTOR SEARCH")
+    print("=" * 100)
 
-    for result in results.points:
+    print("QUERY:", query)
+    print("RESULTS:", len(sparse_results.points))
+
+    for rank, result in enumerate(sparse_results.points, start=1):
 
         payload = result.payload or {}
 
@@ -151,55 +140,36 @@ def retrieve_context(
             or ""
         )
 
-        # ----------------------------------------------
-        # Preserve stored metadata
-        # ----------------------------------------------
-
-        metadata = payload.get("metadata", {}).copy()
-
-        # ----------------------------------------------
-        # Add retrieval information
-        # ----------------------------------------------
-
-        metadata["score"] = result.score
-        metadata["qdrant_id"] = result.id
-
-        # ----------------------------------------------
-        # Create LangChain Document
-        # ----------------------------------------------
-
-        documents.append(
-            Document(
-                page_content=content,
-                metadata=metadata,
-            )
-        )
-
-    # ==================================================
-    # 7. Debug final Documents
-    # ==================================================
-
-    print("\n" + "=" * 100)
-    print("FINAL LANGCHAIN DOCUMENTS")
-    print("DOCUMENT COUNT:", len(documents))
-
-    for rank, doc in enumerate(
-        documents,
-        start=1,
-    ):
-
         print("\n" + "-" * 100)
+        print("SPARSE RANK:", rank)
+        print("SPARSE SCORE:", result.score)
+        print("ID:", result.id)
 
-        print("DOCUMENT:", rank)
-        print("CONTENT LENGTH:", len(doc.page_content))
-        print("CONTENT:")
-        print(doc.page_content[:1000])
+        print("\nCONTENT:")
+        print(content[:1500])
+    fused_results = reciprocal_rank_fusion(dense_results.points, sparse_results.points)
 
-        print("\nMETADATA:")
-        print(doc.metadata)
+    print("RRF RESULTS:", len(fused_results))
 
-    # ==================================================
-    # 8. Return LangChain Documents
-    # ==================================================
+    for rank, point in enumerate(fused_results[:10], 1):
+        print(rank, point.id, point.payload["text"][:150])
+    reranked_results = rerank_documents(
+        query=query,
+        documents=fused_results,
+        top_k=20,
+    )
 
-    return documents
+    print("\nRERANKED RESULTS:")
+
+    for i, doc in enumerate(reranked_results, 1):
+        print(i, doc.id, doc.payload["text"])
+
+
+if __name__ == "__main__":
+    print("hey")
+
+    retrieve_context(
+        "In a Bw-Tree, how do delta node update chains interact with garbage collection, and why does this create a different consistency challenge than the one WiscKey faces when reclaiming space in its vLog during compaction?",
+        "4",
+        5,
+    )

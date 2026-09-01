@@ -64,7 +64,6 @@ workflow.add_edge("query_generation", "retrieval")
 workflow.add_edge("retrieval", "fusion")
 
 workflow.add_edge("fusion", "rerank")
-
 workflow.add_edge("product_faq", END)
 workflow.add_edge("rerank", END)
 
