@@ -1,3 +1,4 @@
+import asyncio
 from qdrant_client import QdrantClient
 from app.services.reranking.rerank import rerank_documents
 
@@ -24,12 +25,13 @@ embedder = OllamaEmbeddings(model=EMBEDDING_MODEL)
 client = QdrantClient(url="http://localhost:6333")
 
 
-def retrieve_context(
+async def retrieve_context(
     query: str,
     user_id: str,
     k: int = 20,
     repo_url: str | None = None,
 ):
+    """Asynchronously retrieve context from vector database."""
     print("hey")
     conditions = [
         FieldCondition(
@@ -47,27 +49,39 @@ def retrieve_context(
         )
 
     search_filter = Filter(must=conditions)
-    print(client.get_collection("documents"))
 
-    print(client.count(collection_name="documents", exact=True))
+    # Run blocking Qdrant operations in thread pool
+    collection_info = await asyncio.to_thread(client.get_collection, "documents")
+    print(collection_info)
 
-    print(
-        client.scroll(
-            collection_name="documents",
-            limit=1,
-            with_payload=True,
-        )
+    count_result = await asyncio.to_thread(
+        client.count, collection_name="documents", exact=True
     )
+    print(count_result)
 
-    dense_vector = embedder.embed_query(query)
+    scroll_result = await asyncio.to_thread(
+        client.scroll,
+        collection_name="documents",
+        limit=1,
+        with_payload=True,
+    )
+    print(scroll_result)
 
-    sparse_embedding = list(sparse_model.embed([query]))[0]
+    # Embedding operations (blocking I/O to LLM)
+    dense_vector = await asyncio.to_thread(embedder.embed_query, query)
+
+    # Sparse embedding
+    sparse_embedding = await asyncio.to_thread(
+        lambda: list(sparse_model.embed([query]))[0]
+    )
     sparse_vector = SparseVector(
         indices=sparse_embedding.indices.tolist(),
         values=sparse_embedding.values.tolist(),
     )
 
-    dense_results = client.query_points(
+    # Query points (blocking I/O)
+    dense_results = await asyncio.to_thread(
+        client.query_points,
         collection_name="documents",
         query=dense_vector,
         using="dense",
@@ -77,7 +91,8 @@ def retrieve_context(
         with_vectors=False,
     )
 
-    sparse_results = client.query_points(
+    sparse_results = await asyncio.to_thread(
+        client.query_points,
         collection_name="documents",
         query=sparse_vector,
         using="sparse",
@@ -147,13 +162,20 @@ def retrieve_context(
 
         print("\nCONTENT:")
         print(content[:1500])
-    fused_results = reciprocal_rank_fusion(dense_results.points, sparse_results.points)
+
+    # Fusion (CPU bound, wrap in thread)
+    fused_results = await asyncio.to_thread(
+        reciprocal_rank_fusion, dense_results.points, sparse_results.points
+    )
 
     print("RRF RESULTS:", len(fused_results))
 
     for rank, point in enumerate(fused_results[:10], 1):
         print(rank, point.id, point.payload["text"][:150])
-    reranked_results = rerank_documents(
+
+    # Reranking (blocking)
+    reranked_results = await asyncio.to_thread(
+        rerank_documents,
         query=query,
         documents=fused_results,
         top_k=20,
@@ -164,12 +186,4 @@ def retrieve_context(
     for i, doc in enumerate(reranked_results, 1):
         print(i, doc.id, doc.payload["text"])
 
-
-if __name__ == "__main__":
-    print("hey")
-
-    retrieve_context(
-        "In a Bw-Tree, how do delta node update chains interact with garbage collection, and why does this create a different consistency challenge than the one WiscKey faces when reclaiming space in its vLog during compaction?",
-        "4",
-        5,
-    )
+    return reranked_results

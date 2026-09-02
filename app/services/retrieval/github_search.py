@@ -143,7 +143,7 @@ def github_embedder(url: str, userId: str):
     return repo
 
 
-def github_parser(state: GraphState):
+async def github_parser(state: GraphState):
     text = state["query"]
 
     match = re.search(r"https?://github\.com/\S+", text)
@@ -160,7 +160,7 @@ def github_parser(state: GraphState):
 
         github_embedder(url, state["userId"])
 
-    documents = retrieve_context(
+    documents = await retrieve_context(
         query=query,
         user_id=state["userId"],
         repo_url=url,

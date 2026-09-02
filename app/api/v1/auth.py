@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, Depends, HTTPException
 from pydantic import BaseModel
 from app.db.models import User
 from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 import jwt
 from fastapi import Response
@@ -29,12 +30,12 @@ class SigninRequest(BaseModel):
 
 @router.post("/signup")
 async def signup(
-    data: SignupRequest, response: Response, db: Session = Depends(get_db)
+    data: SignupRequest, response: Response, db: AsyncSession = Depends(get_db)
 ):
     if not data.email or not data.name or not data.password:
         raise HTTPException(status_code=400, detail="Fields are missing")
-    existing = db.scalar(select(User).where(User.email == data.email))
-    if existing:
+    existing = await db.scalar(select(User).where(User.email == data.email))
+    if existing is not None:
         raise HTTPException(status_code=409, detail="Emails already exist")
     try:
         user = User(
@@ -43,8 +44,8 @@ async def signup(
             password_hash=password_hash.hash(data.password),
         )
         db.add(user)
-        db.commit()
-        db.refresh(user)
+        await db.commit()
+        await db.refresh(user)
         return {"status_code": 200, "id": user.id, "message": "user_created"}
     except:
         db.rollback()
@@ -53,12 +54,12 @@ async def signup(
 
 @router.post("/signin")
 async def signin(
-    data: SigninRequest, response: Response, db: Session = Depends(get_db)
+    data: SigninRequest, response: Response, db: AsyncSession = Depends(get_db)
 ):
     print(data)
     if not data.email or not data.password:
         raise HTTPException(status_code=500, detail="fields are missing")
-    user = db.scalar(select(User).where(User.email == data.email))
+    user = await db.scalar(select(User).where(User.email == data.email))
     if user is None:
         raise HTTPException(status_code=401, detail="invalid email or password")
     print(user)
@@ -84,14 +85,14 @@ async def signin(
 
 
 @router.get("/me")
-async def me(request: Request, db: Session = Depends(get_db)):
+async def me(request: Request, db: AsyncSession = Depends(get_db)):
     token = request.cookies.get("access_token")
 
     if not token:
         raise HTTPException(status_code=401, detail="Not authenticated")
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-        user = db.scalar(select(User).where(User.email == payload["email"]))
+        user = await db.scalar(select(User).where(User.email == payload["email"]))
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
     return {"username": user.name, "email": user.email, "id": user.id}

@@ -4,12 +4,23 @@ from app.api.router import api_router
 from app.db.database import engine
 from app.db.models import Base
 from fastapi.middleware.cors import CORSMiddleware
+import asyncio
 
 app = FastAPI()
 
 app.include_router(api_router, prefix="/api")
 
-Base.metadata.create_all(bind=engine)
+
+async def init_db():
+    """Initialize database tables asynchronously."""
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+
+# Run DB initialization at startup
+@app.on_event("startup")
+async def startup():
+    await init_db()
 
 
 @app.get("/")

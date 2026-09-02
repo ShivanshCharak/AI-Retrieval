@@ -9,6 +9,7 @@ from fastapi import (
 )
 
 from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, JSON
 from pydantic import BaseModel, Field
 
@@ -78,7 +79,7 @@ def get_current_user_id(request: Request) -> int:
 
         return int(user_id)
 
-    except jwt.InvalidTokenError:
+    except jwt.InvalidTokenError as e:
         print("JWT ERROR:", type(e).__name__)
         print("JWT ERROR DETAIL:", str(e))
 
@@ -96,13 +97,14 @@ def get_current_user_id(request: Request) -> int:
 @router.get("/conversations")
 async def all_conversations(
     user_id: int = Depends(get_current_user_id),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ):
-    conversations = db.scalars(
+    conversations_result = await db.scalars(
         select(Conversation)
         .where(Conversation.user_id == user_id)
         .order_by(Conversation.updated_at.desc())
-    ).all()
+    )
+    conversations = conversations_result.all()
 
     return {
         "result": [
@@ -124,9 +126,9 @@ async def all_conversations(
 async def get_conversation(
     conv_id: int,
     user_id: int = Depends(get_current_user_id),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ):
-    conversation = db.scalar(
+    conversation = await db.scalar(
         select(Conversation).where(
             Conversation.id == conv_id,
             Conversation.user_id == user_id,
@@ -163,7 +165,7 @@ async def create_conversation(
     message: str = Form(...),
     uploaded_files: list[UploadFile] | None = File(None),
     user_id: int = Depends(get_current_user_id),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ):
     files = []
 
@@ -185,8 +187,8 @@ async def create_conversation(
     )
 
     db.add(conversation)
-    db.commit()
-    db.refresh(conversation)
+    await db.commit()
+    await db.refresh(conversation)
 
     return {
         "conversation_id": conversation.id,
@@ -204,9 +206,9 @@ async def add_message(
     conv_id: int,
     data: AddMessage,
     user_id: int = Depends(get_current_user_id),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ):
-    conversation = db.scalar(
+    conversation = await db.scalar(
         select(Conversation).where(
             Conversation.id == conv_id,
             Conversation.user_id == user_id,
@@ -230,8 +232,8 @@ async def add_message(
         new_message,
     ]
 
-    db.commit()
-    db.refresh(conversation)
+    await db.commit()
+    await db.refresh(conversation)
 
     return {
         "success": True,
@@ -250,9 +252,9 @@ async def sync_conversation(
     conv_id: int,
     data: SyncConversation,
     user_id: int = Depends(get_current_user_id),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ):
-    conversation = db.scalar(
+    conversation = await db.scalar(
         select(Conversation).where(
             Conversation.id == conv_id,
             Conversation.user_id == user_id,
@@ -267,8 +269,8 @@ async def sync_conversation(
 
     conversation.messages = data.messages
 
-    db.commit()
-    db.refresh(conversation)
+    await db.commit()
+    await db.refresh(conversation)
 
     return {
         "success": True,
@@ -285,7 +287,7 @@ async def sync_conversation(
 @router.post("/conversation/new")
 async def create_empty_conversation(
     user_id: int = Depends(get_current_user_id),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ):
     conversation = Conversation(
         user_id=user_id,
@@ -295,8 +297,8 @@ async def create_empty_conversation(
     )
 
     db.add(conversation)
-    db.commit()
-    db.refresh(conversation)
+    await db.commit()
+    await db.refresh(conversation)
 
     return {
         "conversation_id": conversation.id,

@@ -1,5 +1,6 @@
 import re
 import time
+import asyncio
 
 from pydantic import BaseModel
 from app.services.retrieval.vector_search import vector_search
@@ -268,7 +269,7 @@ def deterministic_retrieval_plan(query: str):
 # ============================================================
 
 
-def retrieval_node(state):
+async def retrieval_node(state):
     start = time.time()
 
     query = state["query"]
@@ -321,10 +322,10 @@ def retrieval_node(state):
             )
 
         if plan.use_vector:
-            docs.extend(retrieve_context(query, userId))
+            docs.extend(await retrieve_context(query, userId))
 
         if plan.use_repo:
-            repo_docs = github_parser(state)
+            repo_docs = await github_parser(state)
 
             if repo_docs:
                 docs.extend(repo_docs)

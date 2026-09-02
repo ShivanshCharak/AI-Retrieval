@@ -1,8 +1,9 @@
 from sentence_transformers import CrossEncoder
 
 reranker = CrossEncoder(
-    "BAAI/bge-reranker-v2-m3",
-    max_length=1024,
+    "cross-encoder/ms-marco-MiniLM-L-2-v2",
+    max_length=512,
+    device="cpu",
 )
 
 
